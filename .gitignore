@@ -1,0 +1,91 @@
+# ====================
+# Java / Maven
+# ====================
+backend/target/
+*.class
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+.mvn/timing.log
+.mvn/wrapper/maven-wrapper.jar
+
+# ====================
+# Node / Frontend
+# ====================
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnpm-debug.log
+
+# ====================
+# 环境变量与配置文件
+# ====================
+.env
+.env.local
+.env.*.local
+*.local
+
+# ====================
+# 日志文件
+# ====================
+*.log
+logs/
+
+# ====================
+# IDE 相关
+# ====================
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.factorypath
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.swp
+*.swo
+*~
+
+# ====================
+# 操作系统文件
+# ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ====================
+# 上传目录（用户上传的文件）
+# ====================
+backend/upload/
+
+# ====================
+# 测试相关
+# ====================
+backend/test-classes/
+backend/surefire-reports/
+
+# ====================
+# 其它
+# ====================
+*.tmp
+*.temp
+*.bak
+*.orig
+*.swp
+*~
+*.sass-cache
+/.history
