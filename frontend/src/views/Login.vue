@@ -8,9 +8,8 @@
     </div>
     <div class="login-box">
       <div class="login-header">
-        <img src="@/assets/logo.svg" alt="logo" class="logo" />
+        <img src="/public/favicon.svg" alt="logo" class="logo" />
         <h1>宿舍事务管理系统</h1>
-        <p>Dormitory Management System</p>
       </div>
 
       <el-form ref="formRef" :model="form" :rules="rules" class="login-form">
@@ -30,7 +29,6 @@
         </el-form-item>
 
         <div class="login-footer">
-          <span>还没有账号？</span>
           <router-link to="/register" class="register-link">立即注册</router-link>
         </div>
 
@@ -38,15 +36,6 @@
           <router-link to="/forgot-password">忘记密码？</router-link>
         </div>
       </el-form>
-
-      <div class="demo-accounts">
-        <p>演示账号：</p>
-        <div class="accounts">
-          <span @click="fillAccount('admin', '123456')">管理员：admin</span>
-          <span @click="fillAccount('manager1', '123456')">宿管：manager1</span>
-          <span @click="fillAccount('2021001001', '123456')">学生：2021001001</span>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -100,11 +89,6 @@ const handleLogin = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const fillAccount = (username, password) => {
-  form.username = username
-  form.password = password
 }
 </script>
 
@@ -261,38 +245,5 @@ const fillAccount = (username, password) => {
 
 .forgot-password a:hover {
   color: #667eea;
-}
-
-.demo-accounts {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.demo-accounts p {
-  font-size: 13px;
-  color: #999;
-  margin: 0 0 10px 0;
-}
-
-.demo-accounts .accounts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.demo-accounts .accounts span {
-  font-size: 12px;
-  color: #667eea;
-  background: #f0f2ff;
-  padding: 5px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.demo-accounts .accounts span:hover {
-  background: #667eea;
-  color: #fff;
 }
 </style>
