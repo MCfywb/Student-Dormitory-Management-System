@@ -114,7 +114,10 @@ const fillAccount = (username, password) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url('/public/mxzab9vh50qd1.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
