@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const BASE_URL = 'http://localhost:8000/api'
+const BASE_URL = 'http://localhost:8080/api'
 
 export function login(data) {
   return request.post('/auth/login', data)

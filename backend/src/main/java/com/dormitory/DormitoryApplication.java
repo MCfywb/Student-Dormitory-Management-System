@@ -15,7 +15,7 @@ public class DormitoryApplication {
         SpringApplication.run(DormitoryApplication.class, args);
         System.out.println("========================================");
         System.out.println("   宿舍事务管理系统启动成功！");
-        System.out.println("   后端地址: http://localhost:8000/api");
+        System.out.println("   后端地址: http://localhost:8080/api");
         System.out.println("========================================");
     }
 }
