@@ -43,6 +43,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new RuntimeException("用户名已存在");
         }
 
+        LambdaQueryWrapper<StudentInfo> studentWrapper = new LambdaQueryWrapper<>();
+        studentWrapper.eq(StudentInfo::getStudentNo, registerDTO.getStudentNo());
+        if (studentInfoMapper.selectCount(studentWrapper) > 0) {
+            throw new RuntimeException("该学号已注册");
+        }
+
         User user = new User();
         user.setUsername(registerDTO.getUsername());
         user.setPassword(registerDTO.getPassword());

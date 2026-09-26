@@ -7,7 +7,7 @@
     </div>
     <div class="forgot-box">
       <div class="forgot-header">
-        <img src="@/assets/logo.svg" alt="logo" class="logo" />
+        <img src="/public/favicon.svg" alt="logo" class="logo" />
         <h1>忘记密码</h1>
         <p>重置您的账户密码</p>
       </div>

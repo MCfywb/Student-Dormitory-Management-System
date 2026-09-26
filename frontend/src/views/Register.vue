@@ -7,7 +7,7 @@
     </div>
     <div class="register-box">
       <div class="register-header">
-        <img src="@/assets/logo.svg" alt="logo" class="logo" />
+        <img src="/public/favicon.svg" alt="logo" class="logo" />
         <h1>住宿人注册</h1>
         <p>创建您的宿舍管理系统账号</p>
       </div>
