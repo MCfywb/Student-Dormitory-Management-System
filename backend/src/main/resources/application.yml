@@ -44,4 +44,4 @@ jwt:
 
 # 文件上传路径配置（使用绝对路径，upload后一定要带/）
 file:
-  upload-path: C:/Users/MCfywb/Downloads/
+  upload-path: C:/Users/MCfywb/Downloads/upload/
