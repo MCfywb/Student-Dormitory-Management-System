@@ -3,7 +3,7 @@
     <el-container>
       <el-aside :width="isCollapse ? '64px' : '220px'" class="sidebar">
         <div class="logo">
-          <img src="@/assets/logo.svg" alt="logo" />
+          <img src="/public/favicon.svg" alt="logo" />
           <span v-show="!isCollapse">宿舍事务管理系统</span>
         </div>
         <el-menu

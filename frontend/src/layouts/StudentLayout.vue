@@ -3,7 +3,7 @@
     <el-container>
       <el-header class="header">
         <div class="logo">
-          <img src="@/assets/logo.svg" alt="logo" />
+          <img src="/public/favicon.svg" alt="logo" />
           <span>宿舍事务管理系统</span>
         </div>
         <el-menu
