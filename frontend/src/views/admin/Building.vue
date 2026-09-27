@@ -117,7 +117,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getBuildingPage, saveBuilding, updateBuilding, deleteBuilding, getBuildingById } from '@/api/building'
-import { getUserInfo } from '@/api/auth'
+import { getManagerPage } from '@/api/manager'
 
 const loading = ref(false)
 const tableData = ref([])
@@ -181,16 +181,11 @@ const loadData = async () => {
 
 const loadManagers = async () => {
   try {
-    const res = await getUserInfo(2)
-    if (res.data && res.data.user) {
-      managerList.value = [res.data.user]
-    }
+    const res = await getManagerPage({ current: 1, size: 100 })
+    managerList.value = res.data.records || []
   } catch (error) {
-    managerList.value = [
-      { id: 2, realName: '张宿管' },
-      { id: 3, realName: '李宿管' },
-      { id: 4, realName: '王宿管' }
-    ]
+    console.error(error)
+    managerList.value = []
   }
 }
 
