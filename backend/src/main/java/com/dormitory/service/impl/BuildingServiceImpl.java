@@ -37,14 +37,14 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
         if (buildingType != null && !buildingType.isEmpty()) {
             wrapper.eq(Building::getBuildingType, buildingType);
         }
-        wrapper.orderByDesc(Building::getCreateTime);
+        wrapper.orderByAsc(Building::getId);
         return this.page(page, wrapper);
     }
 
     @Override
     public List<Building> getList() {
         LambdaQueryWrapper<Building> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByAsc(Building::getBuildingName);
+        wrapper.orderByAsc(Building::getId);
         return this.list(wrapper);
     }
 
