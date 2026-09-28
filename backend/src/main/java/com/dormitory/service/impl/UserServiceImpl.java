@@ -132,7 +132,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (status != null) {
             wrapper.eq(User::getStatus, status);
         }
-        wrapper.orderByDesc(User::getCreateTime);
+        wrapper.orderByAsc(User::getId);
         return this.page(page, wrapper);
     }
 
