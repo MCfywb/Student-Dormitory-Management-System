@@ -123,8 +123,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
+import { isDark } from '@/utils/theme'
 import { 
   getOverview, 
   getBuildingStats, 
@@ -152,6 +153,23 @@ let feeChart = null
 
 const overview = ref({})
 const recentHygiene = ref([])
+
+// 图表数据缓存，主题切换时用于重绘
+const chartData = reactive({
+  building: [],
+  college: [],
+  hygiene: {},
+  facility: {},
+  room: {},
+  fee: {}
+})
+
+// 图表配色随主题变化
+const axisColor = computed(() => (isDark.value ? '#a3a6ad' : '#606266'))
+const titleColor = computed(() => (isDark.value ? '#e5eaf3' : '#303133'))
+const tooltipBg = computed(() => (isDark.value ? '#1d1e1f' : '#ffffff'))
+const tooltipBorder = computed(() => (isDark.value ? '#303030' : '#ebeef5'))
+const pieBorderColor = computed(() => (isDark.value ? '#1d1e1f' : '#ffffff'))
 
 const getScoreType = (score) => {
   if (score >= 90) return 'success'
@@ -182,12 +200,29 @@ const getLevelText = (level) => {
 
 const initBuildingChart = (data) => {
   if (!buildingChartRef.value) return
+  if (buildingChart) buildingChart.dispose()
   buildingChart = echarts.init(buildingChartRef.value)
   const option = {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: data.map(item => item.buildingName) },
-    yAxis: { type: 'value', name: '入住率(%)' },
+    xAxis: {
+      type: 'category',
+      data: data.map(item => item.buildingName),
+      axisLabel: { color: axisColor.value }
+    },
+    yAxis: {
+      type: 'value',
+      name: '入住率(%)',
+      nameTextStyle: { color: axisColor.value },
+      axisLabel: { color: axisColor.value },
+      splitLine: { lineStyle: { color: tooltipBorder.value } }
+    },
     series: [{
       name: '入住率',
       type: 'bar',
@@ -198,7 +233,7 @@ const initBuildingChart = (data) => {
           { offset: 1, color: '#764ba2' }
         ])
       },
-      label: { show: true, position: 'top', formatter: '{c}%' }
+      label: { show: true, position: 'top', formatter: '{c}%', color: titleColor.value }
     }]
   }
   buildingChart.setOption(option)
@@ -206,19 +241,26 @@ const initBuildingChart = (data) => {
 
 const initCollegeChart = (data) => {
   if (!collegeChartRef.value) return
+  if (collegeChart) collegeChart.dispose()
   collegeChart = echarts.init(collegeChartRef.value)
   const option = {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-    legend: { orient: 'vertical', left: 'left', top: 'center' },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)',
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
+    legend: { orient: 'vertical', left: 'left', top: 'center', textStyle: { color: axisColor.value } },
     series: [{
       name: '学院分布',
       type: 'pie',
       radius: ['40%', '70%'],
       center: ['60%', '50%'],
       avoidLabelOverlap: false,
-      itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+      itemStyle: { borderRadius: 10, borderColor: pieBorderColor.value, borderWidth: 2 },
       label: { show: false },
-      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: titleColor.value } },
       data: data
     }]
   }
@@ -227,10 +269,16 @@ const initCollegeChart = (data) => {
 
 const initHygieneChart = (data) => {
   if (!hygieneChartRef.value) return
+  if (hygieneChart) hygieneChart.dispose()
   hygieneChart = echarts.init(hygieneChartRef.value)
   const option = {
-    tooltip: { trigger: 'item' },
-    legend: { top: '5%', left: 'center' },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
+    legend: { top: '5%', left: 'center', textStyle: { color: axisColor.value } },
     series: [{
       name: '卫生检查',
       type: 'pie',
@@ -249,12 +297,19 @@ const initHygieneChart = (data) => {
 
 const initFacilityChart = (data) => {
   if (!facilityChartRef.value) return
+  if (facilityChart) facilityChart.dispose()
   facilityChart = echarts.init(facilityChartRef.value)
   const option = {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: ['正常', '损坏', '维修中', '已报废'] },
-    yAxis: { type: 'value' },
+    xAxis: { type: 'category', data: ['正常', '损坏', '维修中', '已报废'], axisLabel: { color: axisColor.value } },
+    yAxis: { type: 'value', axisLabel: { color: axisColor.value }, splitLine: { lineStyle: { color: tooltipBorder.value } } },
     series: [{
       name: '设施数量',
       type: 'bar',
@@ -272,9 +327,15 @@ const initFacilityChart = (data) => {
 
 const initRoomChart = (data) => {
   if (!roomChartRef.value) return
+  if (roomChart) roomChart.dispose()
   roomChart = echarts.init(roomChartRef.value)
   const option = {
-    tooltip: { trigger: 'item' },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
     series: [{
       name: '房间状态',
       type: 'pie',
@@ -284,7 +345,7 @@ const initRoomChart = (data) => {
         { value: data.availableRooms, name: '可入住', itemStyle: { color: '#67C23A' } },
         { value: data.maintenanceRooms, name: '维修中', itemStyle: { color: '#E6A23C' } }
       ],
-      label: { formatter: '{b}: {c}' }
+      label: { formatter: '{b}: {c}', color: titleColor.value }
     }]
   }
   roomChart.setOption(option)
@@ -292,9 +353,15 @@ const initRoomChart = (data) => {
 
 const initFeeChart = (data) => {
   if (!feeChartRef.value) return
+  if (feeChart) feeChart.dispose()
   feeChart = echarts.init(feeChartRef.value)
   const option = {
-    tooltip: { trigger: 'item' },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: tooltipBg.value,
+      borderColor: tooltipBorder.value,
+      textStyle: { color: titleColor.value }
+    },
     series: [{
       name: '费用情况',
       type: 'pie',
@@ -304,11 +371,25 @@ const initFeeChart = (data) => {
         { value: data.unpaidCount, name: '待缴费', itemStyle: { color: '#E6A23C' } },
         { value: data.overdueCount, name: '已逾期', itemStyle: { color: '#F56C6C' } }
       ],
-      label: { formatter: '{b}: {c}' }
+      label: { formatter: '{b}: {c}', color: titleColor.value }
     }]
   }
   feeChart.setOption(option)
 }
+
+const initAllCharts = () => {
+  initBuildingChart(chartData.building)
+  initCollegeChart(chartData.college)
+  initHygieneChart(chartData.hygiene)
+  initFacilityChart(chartData.facility)
+  initRoomChart(chartData.room)
+  initFeeChart(chartData.fee)
+}
+
+// 主题切换后重绘图表，避免深色背景下文字看不清
+watch(isDark, () => {
+  initAllCharts()
+})
 
 const loadData = async () => {
   try {
@@ -325,13 +406,15 @@ const loadData = async () => {
     
     overview.value = overviewRes.data
     recentHygiene.value = hygieneRecentRes.data
-    
-    initBuildingChart(buildingRes.data)
-    initCollegeChart(collegeRes.data)
-    initHygieneChart(hygieneRes.data)
-    initFacilityChart(facilityRes.data)
-    initRoomChart(roomRes.data)
-    initFeeChart(feeRes.data)
+
+    chartData.building = buildingRes.data || []
+    chartData.college = collegeRes.data || []
+    chartData.hygiene = hygieneRes.data || {}
+    chartData.facility = facilityRes.data || {}
+    chartData.room = roomRes.data || {}
+    chartData.fee = feeRes.data || {}
+
+    initAllCharts()
   } catch (error) {
     console.error(error)
   }
@@ -410,18 +493,18 @@ onUnmounted(() => {
 }
 
 .chart-container {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
 }
 
 .chart-title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--app-text);
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid var(--app-border);
 }
 </style>

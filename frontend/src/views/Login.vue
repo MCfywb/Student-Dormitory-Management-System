@@ -8,7 +8,7 @@
     </div>
     <div class="login-box">
       <div class="login-header">
-        <img src="/public/favicon.svg" alt="logo" class="logo" />
+        <img src="/favicon.svg" alt="logo" class="logo" />
         <h1>宿舍事务管理系统</h1>
       </div>
 
@@ -98,7 +98,7 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('/public/mxzab9vh50qd1.webp');
+  background-image: url('/mxzab9vh50qd1.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -172,7 +172,7 @@ const handleLogin = async () => {
 .login-box {
   width: 420px;
   padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--app-box-bg);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -192,13 +192,13 @@ const handleLogin = async () => {
 
 .login-header h1 {
   font-size: 24px;
-  color: #333;
+  color: var(--app-text);
   margin: 0 0 8px 0;
 }
 
 .login-header p {
   font-size: 14px;
-  color: #999;
+  color: var(--app-text-secondary);
   margin: 0;
 }
 
@@ -221,7 +221,7 @@ const handleLogin = async () => {
 .login-footer {
   text-align: center;
   margin-top: 20px;
-  color: #666;
+  color: var(--app-text-regular);
 }
 
 .register-link {
@@ -240,7 +240,7 @@ const handleLogin = async () => {
 
 .forgot-password a {
   font-size: 13px;
-  color: #999;
+  color: var(--app-text-secondary);
 }
 
 .forgot-password a:hover {

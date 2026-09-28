@@ -163,7 +163,7 @@ onMounted(() => {
 
 <style scoped>
 .my-room {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
   min-height: calc(100vh - 150px);
@@ -179,10 +179,10 @@ onMounted(() => {
 }
 
 .room-card, .roommates-card, .facility-section {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
   margin-bottom: 20px;
 }
 
@@ -212,7 +212,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 10px;
-  background: #f5f7fa;
+  background: var(--app-fill);
   border-radius: 8px;
 }
 
@@ -228,7 +228,7 @@ onMounted(() => {
 
 .roommate-detail {
   font-size: 12px;
-  color: #909399;
+  color: var(--app-text-secondary);
 }
 
 .roommate-bed {
@@ -259,14 +259,14 @@ onMounted(() => {
 
 .empty-title {
   font-size: 24px;
-  color: #303133;
+  color: var(--app-text);
   margin: 0 0 12px 0;
   font-weight: 500;
 }
 
 .empty-desc {
   font-size: 14px;
-  color: #909399;
+  color: var(--app-text-secondary);
   margin: 0 0 30px 0;
 }
 

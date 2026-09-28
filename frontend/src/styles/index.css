@@ -4,9 +4,43 @@
   box-sizing: border-box;
 }
 
+/* ========== 浅色主题变量 ========== */
+:root {
+  --app-bg: #f0f2f5;
+  --app-card-bg: #ffffff;
+  --app-box-bg: rgba(255, 255, 255, 0.95);
+  --app-header-bg: #ffffff;
+  --app-text: #303133;
+  --app-text-regular: #606266;
+  --app-text-secondary: #909399;
+  --app-border: #ebeef5;
+  --app-fill: #f5f7fa;
+  --app-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  --app-sidebar-bg: #304156;
+  --app-sidebar-logo-bg: #263445;
+}
+
+/* ========== 深色主题变量（html 上有 .dark 类时生效） ========== */
+html.dark {
+  --app-bg: #141414;
+  --app-card-bg: #1d1e1f;
+  --app-box-bg: rgba(30, 30, 32, 0.95);
+  --app-header-bg: #1d1e1f;
+  --app-text: #e5eaf3;
+  --app-text-regular: #cfd3dc;
+  --app-text-secondary: #a3a6ad;
+  --app-border: #303030;
+  --app-fill: #262727;
+  --app-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4);
+  --app-sidebar-bg: #304156;
+  --app-sidebar-logo-bg: #263445;
+}
+
 html, body {
   height: 100%;
   font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text);
 }
 
 a {
@@ -32,15 +66,15 @@ a {
 .page-title {
   font-size: 20px;
   font-weight: 600;
-  color: #303133;
+  color: var(--app-text);
 }
 
 .search-form {
   margin-bottom: 20px;
   padding: 20px;
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
 }
 
 .stat-card {
@@ -74,20 +108,20 @@ a {
 }
 
 .chart-container {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
   margin-bottom: 20px;
 }
 
 .chart-title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--app-text);
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .el-menu {

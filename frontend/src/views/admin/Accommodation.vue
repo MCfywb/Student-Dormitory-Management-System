@@ -113,7 +113,7 @@
             <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" :disabled="item.availableBeds === 0 || item.status === 'maintenance'">
               <span>{{ item.roomNumber }}</span>
               <span v-if="item.status === 'maintenance'" style="float: right; color: #e6a23c; font-size: 12px;">维修中</span>
-              <span v-else style="float: right; color: #999; font-size: 12px;">剩余{{ item.availableBeds }}床位</span>
+              <span v-else style="float: right; color: var(--app-text-secondary); font-size: 12px;">剩余{{ item.availableBeds }}床位</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -328,7 +328,7 @@ onMounted(() => {
 
 <style scoped>
 .accommodation-page {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
 }

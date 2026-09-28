@@ -243,12 +243,12 @@ onMounted(() => {
 }
 
 .info-card {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
 }
 
 .info-icon {
@@ -265,20 +265,20 @@ onMounted(() => {
 .info-value {
   font-size: 20px;
   font-weight: bold;
-  color: #303133;
+  color: var(--app-text);
 }
 
 .info-label {
   font-size: 14px;
-  color: #909399;
+  color: var(--app-text-secondary);
   margin-top: 5px;
 }
 
 .notice-section {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
 }
 
 .section-header {
@@ -294,11 +294,11 @@ onMounted(() => {
 }
 
 .user-card {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 30px;
   text-align: center;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
   margin-bottom: 20px;
 }
 
@@ -313,15 +313,15 @@ onMounted(() => {
 
 .user-info p {
   margin: 0 0 20px 0;
-  color: #909399;
+  color: var(--app-text-secondary);
   font-size: 14px;
 }
 
 .quick-actions {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
   margin-bottom: 20px;
 }
 
@@ -341,7 +341,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 15px;
-  background: #f5f7fa;
+  background: var(--app-fill);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
@@ -358,10 +358,10 @@ onMounted(() => {
 }
 
 .fee-reminder {
-  background: #fff;
+  background: var(--app-card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow);
 }
 
 .fee-reminder h3 {
@@ -374,7 +374,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .fee-item:last-child {
@@ -388,12 +388,12 @@ onMounted(() => {
 
 .fee-name {
   font-size: 14px;
-  color: #303133;
+  color: var(--app-text);
 }
 
 .fee-semester {
   font-size: 12px;
-  color: #909399;
+  color: var(--app-text-secondary);
 }
 
 .fee-amount {
@@ -408,12 +408,12 @@ onMounted(() => {
 }
 
 .notice-detail .meta {
-  color: #909399;
+  color: var(--app-text-secondary);
   font-size: 14px;
 }
 
 .notice-detail .content {
   line-height: 1.8;
-  color: #606266;
+  color: var(--app-text-regular);
 }
 </style>

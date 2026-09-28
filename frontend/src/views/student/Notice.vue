@@ -88,23 +88,23 @@ onMounted(() => {
 
 <style scoped>
 .student-notice {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
 }
 
 .notice-detail h2 {
   margin: 0 0 15px 0;
-  color: #303133;
+  color: var(--app-text);
 }
 
 .notice-detail .meta {
-  color: #909399;
+  color: var(--app-text-secondary);
   font-size: 14px;
 }
 
 .notice-detail .content {
   line-height: 1.8;
-  color: #606266;
+  color: var(--app-text-regular);
 }
 </style>

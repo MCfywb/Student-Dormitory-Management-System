@@ -7,7 +7,7 @@
     </div>
     <div class="register-box">
       <div class="register-header">
-        <img src="/public/favicon.svg" alt="logo" class="logo" />
+        <img src="/favicon.svg" alt="logo" class="logo" />
         <h1>住宿人注册</h1>
         <p>创建您的宿舍管理系统账号</p>
       </div>
@@ -217,7 +217,7 @@ const handleRegister = async () => {
   position: absolute;
   border-radius: 50%;
   opacity: 0.1;
-  background: #fff;
+  background: var(--app-card-bg);
 }
 
 .shape1 {
@@ -256,7 +256,7 @@ const handleRegister = async () => {
 .register-box {
   width: 600px;
   padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--app-box-bg);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -276,13 +276,13 @@ const handleRegister = async () => {
 
 .register-header h1 {
   font-size: 24px;
-  color: #333;
+  color: var(--app-text);
   margin: 0 0 8px 0;
 }
 
 .register-header p {
   font-size: 14px;
-  color: #999;
+  color: var(--app-text-secondary);
   margin: 0;
 }
 

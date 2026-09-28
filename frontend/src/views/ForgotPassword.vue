@@ -7,7 +7,7 @@
     </div>
     <div class="forgot-box">
       <div class="forgot-header">
-        <img src="/public/favicon.svg" alt="logo" class="logo" />
+        <img src="/favicon.svg" alt="logo" class="logo" />
         <h1>忘记密码</h1>
         <p>重置您的账户密码</p>
       </div>
@@ -142,7 +142,7 @@ const handleReset = async () => {
   position: absolute;
   border-radius: 50%;
   opacity: 0.1;
-  background: #fff;
+  background: var(--app-card-bg);
 }
 
 .shape1 {
@@ -181,7 +181,7 @@ const handleReset = async () => {
 .forgot-box {
   width: 420px;
   padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--app-box-bg);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -201,13 +201,13 @@ const handleReset = async () => {
 
 .forgot-header h1 {
   font-size: 24px;
-  color: #333;
+  color: var(--app-text);
   margin: 0 0 8px 0;
 }
 
 .forgot-header p {
   font-size: 14px;
-  color: #999;
+  color: var(--app-text-secondary);
   margin: 0;
 }
 

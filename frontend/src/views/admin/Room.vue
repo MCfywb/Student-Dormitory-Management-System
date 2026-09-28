@@ -427,7 +427,7 @@ onMounted(() => {
 
 <style scoped>
 .room-page {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
 }
@@ -448,7 +448,7 @@ onMounted(() => {
 .section-title {
   font-size: 16px;
   font-weight: 500;
-  color: #303133;
+  color: var(--app-text);
   margin: 0 0 16px 0;
   padding-left: 10px;
   border-left: 3px solid #409EFF;
@@ -473,14 +473,14 @@ onMounted(() => {
 }
 
 .bed-item.empty {
-  background: #f5f7fa;
-  border: 1px dashed #dcdfe6;
+  background: var(--app-fill);
+  border: 1px dashed var(--app-border);
 }
 
 .bed-number {
   font-size: 14px;
   font-weight: 500;
-  color: #606266;
+  color: var(--app-text-regular);
   margin-bottom: 8px;
 }
 

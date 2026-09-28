@@ -3,7 +3,7 @@
     <el-container>
       <el-header class="header">
         <div class="logo">
-          <img src="/public/favicon.svg" alt="logo" />
+          <img src="/favicon.svg" alt="logo" />
           <span>宿舍事务管理系统</span>
         </div>
         <el-menu
@@ -22,6 +22,18 @@
           <el-menu-item index="/student/notice">公告通知</el-menu-item>
         </el-menu>
         <div class="user-area">
+          <el-dropdown @command="handleThemeCommand" class="theme-dropdown">
+            <span class="theme-switch">
+              <el-icon :size="18"><Moon v-if="isDark" /><Sunny v-else /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="auto" :disabled="themePref === 'auto'">跟随系统</el-dropdown-item>
+                <el-dropdown-item command="light" :disabled="themePref === 'light'">浅色</el-dropdown-item>
+                <el-dropdown-item command="dark" :disabled="themePref === 'dark'">深色</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" :src="avatarUrl" />
@@ -50,15 +62,23 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { getAvatarUrl } from '@/api/auth'
 import { useUserStore } from '@/stores/userStore'
+import { isDark, getThemePreference, setThemePreference } from '@/utils/theme'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+
+const themePref = ref(getThemePreference())
+
+const handleThemeCommand = (command) => {
+  setThemePreference(command)
+  themePref.value = command
+}
 
 const avatarUrl = computed(() => {
   return getAvatarUrl(userStore.userInfo.value?.avatar)
@@ -86,7 +106,7 @@ const handleCommand = (command) => {
 <style scoped>
 .student-layout {
   height: 100vh;
-  background: #f0f2f5;
+  background: var(--app-bg);
 }
 
 .student-layout .el-container {
@@ -132,6 +152,19 @@ const handleCommand = (command) => {
 
 .user-area {
   margin-left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.theme-dropdown {
+  margin-right: 16px;
+}
+
+.theme-switch {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
 }
 
 .user-info {

@@ -229,7 +229,7 @@ onMounted(() => {
 
 <style scoped>
 .repair-page {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
 }

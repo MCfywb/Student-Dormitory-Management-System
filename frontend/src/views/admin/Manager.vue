@@ -284,7 +284,7 @@ onMounted(() => {
 
 <style scoped>
 .manager-page {
-  background: #fff;
+  background: var(--app-card-bg);
   padding: 20px;
   border-radius: 8px;
 }
@@ -299,7 +299,7 @@ onMounted(() => {
 .page-title {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--app-text);
 }
 
 .search-form {
