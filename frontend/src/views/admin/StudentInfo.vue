@@ -13,6 +13,11 @@
         <el-form-item label="姓名">
           <el-input v-model="searchForm.realName" placeholder="请输入姓名" clearable />
         </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="searchForm.gender" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="学院">
           <el-select v-model="searchForm.college" placeholder="请选择" clearable style="width: 200px">
             <el-option label="计算机学院" value="计算机学院" />
@@ -20,6 +25,11 @@
             <el-option label="经管学院" value="经管学院" />
             <el-option label="机械学院" value="机械学院" />
             <el-option label="艺术学院" value="艺术学院" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年级">
+          <el-select v-model="searchForm.grade" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in gradeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -158,8 +168,22 @@ const pagination = reactive({
 const searchForm = reactive({
   studentNo: '',
   realName: '',
-  college: ''
+  college: '',
+  gender: '',
+  grade: ''
 })
+
+const genderOptions = ref([
+  { value: '男', label: '男' },
+  { value: '女', label: '女' }
+])
+
+const gradeOptions = ref([
+  { value: '2021级', label: '2021级' },
+  { value: '2022级', label: '2022级' },
+  { value: '2023级', label: '2023级' },
+  { value: '2024级', label: '2024级' }
+])
 
 const form = reactive({
   id: null,
@@ -228,6 +252,8 @@ const handleReset = () => {
   searchForm.studentNo = ''
   searchForm.realName = ''
   searchForm.college = ''
+  searchForm.gender = ''
+  searchForm.grade = ''
   handleSearch()
 }
 

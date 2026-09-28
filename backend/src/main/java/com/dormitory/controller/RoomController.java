@@ -27,8 +27,9 @@ public class RoomController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String roomNumber,
             @RequestParam(required = false) Long buildingId,
-            @RequestParam(required = false) String status) {
-        Page<Room> page = roomService.getPage(current, size, roomNumber, buildingId, status);
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String roomType) {
+        Page<Room> page = roomService.getPage(current, size, roomNumber, buildingId, status, roomType);
         return Result.success(new PageResult<>(page));
     }
 

@@ -17,6 +17,16 @@
             <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
           </el-select>
         </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="searchForm.gender" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -154,8 +164,20 @@ const pagination = reactive({
 const searchForm = reactive({
   studentNo: '',
   realName: '',
-  buildingId: null
+  buildingId: null,
+  gender: '',
+  status: ''
 })
+
+const genderOptions = ref([
+  { value: '男', label: '男' },
+  { value: '女', label: '女' }
+])
+
+const statusOptions = ref([
+  { value: 'checked_in', label: '已入住' },
+  { value: 'unchecked', label: '未入住' }
+])
 
 const assignForm = reactive({
   studentId: null,
@@ -219,6 +241,8 @@ const handleReset = () => {
   searchForm.studentNo = ''
   searchForm.realName = ''
   searchForm.buildingId = null
+  searchForm.gender = ''
+  searchForm.status = ''
   handleSearch()
 }
 

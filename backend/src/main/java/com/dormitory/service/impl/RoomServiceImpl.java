@@ -26,7 +26,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
     private StudentInfoMapper studentInfoMapper;
 
     @Override
-    public Page<Room> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String status) {
+    public Page<Room> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String status, String roomType) {
         Page<Room> page = new Page<>(current, size);
         LambdaQueryWrapper<Room> wrapper = new LambdaQueryWrapper<>();
         if (roomNumber != null && !roomNumber.isEmpty()) {
@@ -37,6 +37,9 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
         }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Room::getStatus, status);
+        }
+        if (roomType != null && !roomType.isEmpty()) {
+            wrapper.eq(Room::getRoomType, roomType);
         }
         wrapper.orderByAsc(Room::getBuildingId).orderByAsc(Room::getFloor).orderByAsc(Room::getRoomNumber);
         Page<Room> result = this.page(page, wrapper);

@@ -14,8 +14,12 @@
         </el-form-item>
         <el-form-item label="楼栋类型">
           <el-select v-model="searchForm.buildingType" placeholder="请选择" clearable style="width: 200px">
-            <el-option label="男生楼" value="male" />
-            <el-option label="女生楼" value="female" />
+            <el-option v-for="item in buildingTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="宿管">
+          <el-select v-model="searchForm.managerId" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in managerList" :key="item.id" :label="item.realName" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -71,8 +75,7 @@
         </el-form-item>
         <el-form-item label="楼栋类型" prop="buildingType">
           <el-select v-model="form.buildingType" placeholder="请选择" style="width: 100%">
-            <el-option label="男生楼" value="male" />
-            <el-option label="女生楼" value="female" />
+            <el-option v-for="item in buildingTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="楼层数" prop="floors">
@@ -128,6 +131,11 @@ const formRef = ref(null)
 const managerList = ref([])
 const detailData = ref({})
 
+const buildingTypeOptions = ref([
+  { value: 'male', label: '男生楼' },
+  { value: 'female', label: '女生楼' }
+])
+
 const pagination = reactive({
   current: 1,
   size: 10,
@@ -136,7 +144,8 @@ const pagination = reactive({
 
 const searchForm = reactive({
   buildingName: '',
-  buildingType: ''
+  buildingType: '',
+  managerId: null
 })
 
 const form = reactive({
@@ -197,6 +206,7 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.buildingName = ''
   searchForm.buildingType = ''
+  searchForm.managerId = null
   handleSearch()
 }
 

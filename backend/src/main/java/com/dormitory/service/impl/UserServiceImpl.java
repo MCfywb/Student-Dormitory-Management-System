@@ -118,7 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Page<User> getManagerPage(Integer current, Integer size, String username, String realName, Integer status) {
+    public Page<User> getManagerPage(Integer current, Integer size, String username, String realName, Integer status, String gender) {
         Page<User> page = new Page<>(current, size);
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getRole, "manager");
@@ -127,6 +127,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         if (StringUtils.hasText(realName)) {
             wrapper.like(User::getRealName, realName);
+        }
+        if (StringUtils.hasText(gender)) {
+            wrapper.eq(User::getGender, gender);
         }
         if (status != null) {
             wrapper.eq(User::getStatus, status);

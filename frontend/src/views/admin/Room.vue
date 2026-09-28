@@ -17,11 +17,14 @@
             <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
           </el-select>
         </el-form-item>
+        <el-form-item label="房间类型">
+          <el-select v-model="searchForm.roomType" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in roomTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
-            <el-option label="可入住" value="available" />
-            <el-option label="已满" value="full" />
-            <el-option label="维修中" value="maintenance" />
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -94,15 +97,12 @@
         </el-form-item>
         <el-form-item label="房间类型" prop="roomType">
           <el-select v-model="form.roomType" placeholder="请选择" style="width: 100%">
-            <el-option label="标准间" value="standard" />
-            <el-option label="优越间" value="superior" />
+            <el-option v-for="item in roomTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择" style="width: 100%">
-            <el-option label="可入住" value="available" />
-            <el-option label="已满" value="full" />
-            <el-option label="维修中" value="maintenance" />
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="费用(元/学期)" prop="price">
@@ -206,6 +206,15 @@ import { getRoommates } from '@/api/student'
 const loading = ref(false)
 const tableData = ref([])
 const buildingList = ref([])
+const roomTypeOptions = ref([
+  { value: 'standard', label: '标准间' },
+  { value: 'superior', label: '优越间' }
+])
+const statusOptions = ref([
+  { value: 'available', label: '可入住', type: 'success' },
+  { value: 'full', label: '已满', type: 'danger' },
+  { value: 'maintenance', label: '维修中', type: 'warning' }
+])
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
@@ -222,7 +231,8 @@ const pagination = reactive({
 const searchForm = reactive({
   roomNumber: '',
   buildingId: null,
-  status: ''
+  status: '',
+  roomType: ''
 })
 
 const form = reactive({
@@ -309,6 +319,7 @@ const handleReset = () => {
   searchForm.roomNumber = ''
   searchForm.buildingId = null
   searchForm.status = ''
+  searchForm.roomType = ''
   handleSearch()
 }
 

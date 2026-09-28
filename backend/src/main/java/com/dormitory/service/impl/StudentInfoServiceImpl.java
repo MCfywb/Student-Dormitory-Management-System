@@ -25,7 +25,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     private UserMapper userMapper;
 
     @Override
-    public Page<StudentInfo> getPage(Integer current, Integer size, String studentNo, String realName, Long buildingId) {
+    public Page<StudentInfo> getPage(Integer current, Integer size, String studentNo, String realName, String college, Long buildingId, String gender, String grade, String status) {
         Page<StudentInfo> page = new Page<>(current, size);
         LambdaQueryWrapper<StudentInfo> wrapper = new LambdaQueryWrapper<>();
         if (studentNo != null && !studentNo.isEmpty()) {
@@ -34,8 +34,24 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         if (realName != null && !realName.isEmpty()) {
             wrapper.like(StudentInfo::getRealName, realName);
         }
+        if (college != null && !college.isEmpty()) {
+            wrapper.eq(StudentInfo::getCollege, college);
+        }
         if (buildingId != null) {
             wrapper.eq(StudentInfo::getBuildingId, buildingId);
+        }
+        if (gender != null && !gender.isEmpty()) {
+            wrapper.eq(StudentInfo::getGender, gender);
+        }
+        if (grade != null && !grade.isEmpty()) {
+            wrapper.eq(StudentInfo::getGrade, grade);
+        }
+        if (status != null && !status.isEmpty()) {
+            if ("checked_in".equals(status)) {
+                wrapper.eq(StudentInfo::getStatus, "checked_in");
+            } else if ("unchecked".equals(status)) {
+                wrapper.ne(StudentInfo::getStatus, "checked_in");
+            }
         }
         wrapper.orderByAsc(StudentInfo::getId);
         return this.page(page, wrapper);

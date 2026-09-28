@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface RoomService extends IService<Room> {
 
-    Page<Room> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String status);
+    Page<Room> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String status, String roomType);
 
     List<Room> getAvailableRooms(Long buildingId);
 

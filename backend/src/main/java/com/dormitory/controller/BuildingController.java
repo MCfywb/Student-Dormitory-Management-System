@@ -26,8 +26,9 @@ public class BuildingController {
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String buildingName,
-            @RequestParam(required = false) String buildingType) {
-        Page<Building> page = buildingService.getPage(current, size, buildingName, buildingType);
+            @RequestParam(required = false) String buildingType,
+            @RequestParam(required = false) Long managerId) {
+        Page<Building> page = buildingService.getPage(current, size, buildingName, buildingType, managerId);
         return Result.success(new PageResult<>(page));
     }
 

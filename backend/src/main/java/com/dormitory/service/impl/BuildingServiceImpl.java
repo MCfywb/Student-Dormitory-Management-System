@@ -28,7 +28,7 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
     private StudentInfoMapper studentInfoMapper;
 
     @Override
-    public Page<Building> getPage(Integer current, Integer size, String buildingName, String buildingType) {
+    public Page<Building> getPage(Integer current, Integer size, String buildingName, String buildingType, Long managerId) {
         Page<Building> page = new Page<>(current, size);
         LambdaQueryWrapper<Building> wrapper = new LambdaQueryWrapper<>();
         if (buildingName != null && !buildingName.isEmpty()) {
@@ -36,6 +36,9 @@ public class BuildingServiceImpl extends ServiceImpl<BuildingMapper, Building> i
         }
         if (buildingType != null && !buildingType.isEmpty()) {
             wrapper.eq(Building::getBuildingType, buildingType);
+        }
+        if (managerId != null) {
+            wrapper.eq(Building::getManagerId, managerId);
         }
         wrapper.orderByAsc(Building::getId);
         return this.page(page, wrapper);

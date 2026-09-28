@@ -13,6 +13,11 @@
         <el-form-item label="姓名">
           <el-input v-model="searchForm.realName" placeholder="请输入姓名" clearable />
         </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="searchForm.gender" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
             <el-option label="启用" :value="1" />
@@ -126,8 +131,14 @@ const pagination = reactive({
 const searchForm = reactive({
   username: '',
   realName: '',
+  gender: '',
   status: null
 })
+
+const genderOptions = ref([
+  { value: '男', label: '男' },
+  { value: '女', label: '女' }
+])
 
 const form = reactive({
   id: null,
@@ -194,6 +205,7 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.username = ''
   searchForm.realName = ''
+  searchForm.gender = ''
   searchForm.status = null
   handleSearch()
 }

@@ -23,7 +23,7 @@ public interface UserService extends IService<User> {
 
     User getUserByUsername(String username);
 
-    Page<User> getManagerPage(Integer current, Integer size, String username, String realName, Integer status);
+    Page<User> getManagerPage(Integer current, Integer size, String username, String realName, Integer status, String gender);
 
     void addManager(User user);
 

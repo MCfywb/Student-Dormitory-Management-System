@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface StudentInfoService extends IService<StudentInfo> {
 
-    Page<StudentInfo> getPage(Integer current, Integer size, String studentNo, String realName, Long buildingId);
+    Page<StudentInfo> getPage(Integer current, Integer size, String studentNo, String realName, String college, Long buildingId, String gender, String grade, String status);
 
     StudentInfo getByUserId(Long userId);
 

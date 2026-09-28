@@ -20,8 +20,9 @@ public class ManagerController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String realName,
+            @RequestParam(required = false) String gender,
             @RequestParam(required = false) Integer status) {
-        Page<User> page = userService.getManagerPage(current, size, username, realName, status);
+        Page<User> page = userService.getManagerPage(current, size, username, realName, status, gender);
         return Result.success(page);
     }
 
