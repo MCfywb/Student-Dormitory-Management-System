@@ -100,9 +100,10 @@
         </el-form-item>
         <el-form-item label="房间" required>
           <el-select v-model="assignForm.roomId" placeholder="请选择房间" @change="handleRoomChange" style="width: 100%">
-            <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" :disabled="item.availableBeds === 0">
+            <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" :disabled="item.availableBeds === 0 || item.status === 'maintenance'">
               <span>{{ item.roomNumber }}</span>
-              <span style="float: right; color: #999; font-size: 12px;">剩余{{ item.availableBeds }}床位</span>
+              <span v-if="item.status === 'maintenance'" style="float: right; color: #e6a23c; font-size: 12px;">维修中</span>
+              <span v-else style="float: right; color: #999; font-size: 12px;">剩余{{ item.availableBeds }}床位</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -134,7 +135,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getStudentPage, getStudentById } from '@/api/student'
 import { getBuildingList } from '@/api/building'
-import { leaveRoom, getRoomPage, assignRoom } from '@/api/room'
+import { leaveRoom, getRoomsByBuilding, assignRoom } from '@/api/room'
 
 const loading = ref(false)
 const tableData = ref([])
@@ -265,8 +266,8 @@ const handleBuildingChange = async () => {
     return
   }
   try {
-    const res = await getRoomPage({ current: 1, size: 100, buildingId: assignForm.buildingId })
-    roomList.value = res.data.records
+    const res = await getRoomsByBuilding(assignForm.buildingId)
+    roomList.value = res.data
   } catch (error) {
     console.error(error)
   }
