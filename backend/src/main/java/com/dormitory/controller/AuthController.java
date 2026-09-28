@@ -35,6 +35,9 @@ public class AuthController {
         if (user == null) {
             return Result.error("用户名或密码错误");
         }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            return Result.error("账号已禁用");
+        }
         
         Map<String, Object> data = new HashMap<>();
         data.put("user", user);

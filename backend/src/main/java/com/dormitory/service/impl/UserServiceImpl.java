@@ -30,8 +30,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User login(LoginDTO loginDTO) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getUsername, loginDTO.getUsername())
-                .eq(User::getPassword, loginDTO.getPassword())
-                .eq(User::getStatus, 1);
+                .eq(User::getPassword, loginDTO.getPassword());
         return this.getOne(wrapper);
     }
 
