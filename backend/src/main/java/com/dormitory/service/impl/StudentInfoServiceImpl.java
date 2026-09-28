@@ -37,7 +37,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         if (buildingId != null) {
             wrapper.eq(StudentInfo::getBuildingId, buildingId);
         }
-        wrapper.orderByDesc(StudentInfo::getCreateTime);
+        wrapper.orderByAsc(StudentInfo::getId);
         return this.page(page, wrapper);
     }
 
