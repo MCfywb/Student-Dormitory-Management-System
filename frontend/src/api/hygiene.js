@@ -8,6 +8,10 @@ export function getHygieneByRoom(roomId) {
   return request.get(`/hygiene/room/${roomId}`)
 }
 
+export function getCheckerNames() {
+  return request.get('/hygiene/checkers')
+}
+
 export function getHygieneStats() {
   return request.get('/hygiene/stats')
 }

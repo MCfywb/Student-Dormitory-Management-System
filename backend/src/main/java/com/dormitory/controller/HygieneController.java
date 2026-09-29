@@ -27,9 +27,15 @@ public class HygieneController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String roomNumber,
             @RequestParam(required = false) Long buildingId,
-            @RequestParam(required = false) String level) {
-        Page<Hygiene> page = hygieneService.getPage(current, size, roomNumber, buildingId, level);
+            @RequestParam(required = false) String level,
+            @RequestParam(required = false) String checkerName) {
+        Page<Hygiene> page = hygieneService.getPage(current, size, roomNumber, buildingId, level, checkerName);
         return Result.success(new PageResult<>(page));
+    }
+
+    @GetMapping("/checkers")
+    public Result<List<String>> getCheckerNames() {
+        return Result.success(hygieneService.getCheckerNames());
     }
 
     @GetMapping("/room/{roomId}")

@@ -25,6 +25,11 @@
             <el-option label="不合格" value="unqualified" />
           </el-select>
         </el-form-item>
+        <el-form-item label="检查人">
+          <el-select v-model="searchForm.checkerName" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in checkerList" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -95,7 +100,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getHygienePage, saveHygiene, updateHygiene, deleteHygiene } from '@/api/hygiene'
+import { getHygienePage, saveHygiene, updateHygiene, deleteHygiene, getCheckerNames } from '@/api/hygiene'
 import { getBuildingList } from '@/api/building'
 import { getRoomsByBuilding } from '@/api/room'
 
@@ -103,6 +108,7 @@ const loading = ref(false)
 const tableData = ref([])
 const buildingList = ref([])
 const roomList = ref([])
+const checkerList = ref([])
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
@@ -118,7 +124,8 @@ const pagination = reactive({
 const searchForm = reactive({
   roomNumber: '',
   buildingId: null,
-  level: ''
+  level: '',
+  checkerName: ''
 })
 
 const form = reactive({
@@ -196,6 +203,15 @@ const loadRooms = async (buildingId) => {
   }
 }
 
+const loadCheckers = async () => {
+  try {
+    const res = await getCheckerNames()
+    checkerList.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const handleSearch = () => {
   pagination.current = 1
   loadData()
@@ -205,6 +221,7 @@ const handleReset = () => {
   searchForm.roomNumber = ''
   searchForm.buildingId = null
   searchForm.level = ''
+  searchForm.checkerName = ''
   handleSearch()
 }
 
@@ -281,6 +298,7 @@ const resetForm = () => {
 onMounted(() => {
   loadData()
   loadBuildings()
+  loadCheckers()
 })
 </script>
 

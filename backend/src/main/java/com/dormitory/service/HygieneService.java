@@ -12,9 +12,11 @@ import java.util.Map;
  */
 public interface HygieneService extends IService<Hygiene> {
 
-    Page<Hygiene> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String level);
+    Page<Hygiene> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String level, String checkerName);
 
     List<Hygiene> getByRoomId(Long roomId);
+
+    List<String> getCheckerNames();
 
     void addCheck(Hygiene hygiene);
 

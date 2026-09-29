@@ -17,7 +17,7 @@ import java.util.*;
 public class HygieneServiceImpl extends ServiceImpl<HygieneMapper, Hygiene> implements HygieneService {
 
     @Override
-    public Page<Hygiene> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String level) {
+    public Page<Hygiene> getPage(Integer current, Integer size, String roomNumber, Long buildingId, String level, String checkerName) {
         Page<Hygiene> page = new Page<>(current, size);
         LambdaQueryWrapper<Hygiene> wrapper = new LambdaQueryWrapper<>();
         if (roomNumber != null && !roomNumber.isEmpty()) {
@@ -29,8 +29,28 @@ public class HygieneServiceImpl extends ServiceImpl<HygieneMapper, Hygiene> impl
         if (level != null && !level.isEmpty()) {
             wrapper.eq(Hygiene::getLevel, level);
         }
+        if (checkerName != null && !checkerName.isEmpty()) {
+            wrapper.eq(Hygiene::getCheckerName, checkerName);
+        }
         wrapper.orderByDesc(Hygiene::getCheckDate);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public List<String> getCheckerNames() {
+        LambdaQueryWrapper<Hygiene> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(Hygiene::getCheckerName)
+                .ne(Hygiene::getCheckerName, "")
+                .select(Hygiene::getCheckerName)
+                .groupBy(Hygiene::getCheckerName);
+        List<Hygiene> list = this.list(wrapper);
+        List<String> names = new ArrayList<>();
+        for (Hygiene hygiene : list) {
+            if (hygiene.getCheckerName() != null && !hygiene.getCheckerName().isEmpty()) {
+                names.add(hygiene.getCheckerName());
+            }
+        }
+        return names;
     }
 
     @Override
