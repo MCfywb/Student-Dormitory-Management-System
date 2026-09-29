@@ -72,11 +72,16 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="楼栋" prop="buildingId">
+          <el-select v-model="form.buildingId" placeholder="请选择楼栋" style="width: 100%" @change="handleBuildingChange">
+            <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="房间" prop="roomId">
-          <el-select v-model="form.roomId" placeholder="请选择房间" style="width: 100%" @change="handleRoomChange">
-            <el-option v-for="item in roomList" :key="item.id" :label="`${item.buildingName} - ${item.roomNumber}`" :value="item.id" />
+          <el-select v-model="form.roomId" placeholder="请先选择楼栋" style="width: 100%" :disabled="!form.buildingId" @change="handleRoomChange">
+            <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="检查日期" prop="checkDate">
@@ -143,6 +148,7 @@ const form = reactive({
 })
 
 const rules = {
+  buildingId: [{ required: true, message: '请选择楼栋', trigger: 'change' }],
   roomId: [{ required: true, message: '请选择房间', trigger: 'change' }],
   checkDate: [{ required: true, message: '请选择检查日期', trigger: 'change' }],
   score: [{ required: true, message: '请输入分数', trigger: 'blur' }]
@@ -186,9 +192,6 @@ const loadBuildings = async () => {
   try {
     const res = await getBuildingList()
     buildingList.value = res.data
-    if (buildingList.value.length > 0) {
-      loadRooms(buildingList.value[0].id)
-    }
   } catch (error) {
     console.error(error)
   }
@@ -234,6 +237,10 @@ const handleAdd = () => {
 const handleEdit = (row) => {
   dialogTitle.value = '编辑检查记录'
   Object.assign(form, row)
+  // 按该记录所属楼栋加载房间，保证房间下拉框能回显
+  if (row.buildingId) {
+    loadRooms(row.buildingId)
+  }
   dialogVisible.value = true
 }
 
@@ -253,6 +260,20 @@ const handleDelete = (row) => {
   }).catch(() => {})
 }
 
+const handleBuildingChange = (buildingId) => {
+  const building = buildingList.value.find(item => item.id === buildingId)
+  if (building) {
+    form.buildingName = building.buildingName
+  }
+  // 切换楼栋后清空已选房间，并按新楼栋重新拉取房间列表
+  form.roomId = null
+  form.roomNumber = ''
+  roomList.value = []
+  if (buildingId) {
+    loadRooms(buildingId)
+  }
+}
+
 const handleRoomChange = (val) => {
   const room = roomList.value.find(item => item.id === val)
   if (room) {
@@ -260,6 +281,10 @@ const handleRoomChange = (val) => {
     form.buildingId = room.buildingId
     form.buildingName = room.buildingName
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {
@@ -283,6 +308,7 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   form.id = null
+  roomList.value = []
   form.roomId = null
   form.roomNumber = ''
   form.buildingId = null

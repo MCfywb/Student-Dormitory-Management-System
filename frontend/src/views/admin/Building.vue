@@ -48,10 +48,9 @@
           {{ formatDate(row.createTime) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-          <el-button type="primary" link @click="handleView(row)">详情</el-button>
           <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
@@ -68,7 +67,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="楼栋名称" prop="buildingName">
           <el-input v-model="form.buildingName" placeholder="请输入楼栋名称" />
@@ -99,20 +98,6 @@
       </template>
     </el-dialog>
     
-    <el-dialog v-model="detailVisible" title="宿舍楼详情" width="600px">
-      <el-descriptions :column="2" border>
-        <el-descriptions-item label="楼栋名称">{{ detailData.buildingName }}</el-descriptions-item>
-        <el-descriptions-item label="楼栋类型">
-          <el-tag :type="detailData.buildingType === 'male' ? 'primary' : 'danger'">
-            {{ detailData.buildingType === 'male' ? '男生楼' : '女生楼' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="楼层数">{{ detailData.floors }}</el-descriptions-item>
-        <el-descriptions-item label="每层房间数">{{ detailData.roomsPerFloor }}</el-descriptions-item>
-        <el-descriptions-item label="宿管">{{ detailData.managerName }}</el-descriptions-item>
-        <el-descriptions-item label="描述">{{ detailData.description }}</el-descriptions-item>
-      </el-descriptions>
-    </el-dialog>
   </div>
 </template>
 
@@ -125,11 +110,9 @@ import { getManagerPage } from '@/api/manager'
 const loading = ref(false)
 const tableData = ref([])
 const dialogVisible = ref(false)
-const detailVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
 const managerList = ref([])
-const detailData = ref({})
 
 const buildingTypeOptions = ref([
   { value: 'male', label: '男生楼' },
@@ -163,7 +146,8 @@ const rules = {
   buildingName: [{ required: true, message: '请输入楼栋名称', trigger: 'blur' }],
   buildingType: [{ required: true, message: '请选择楼栋类型', trigger: 'change' }],
   floors: [{ required: true, message: '请输入楼层数', trigger: 'blur' }],
-  roomsPerFloor: [{ required: true, message: '请输入每层房间数', trigger: 'blur' }]
+  roomsPerFloor: [{ required: true, message: '请输入每层房间数', trigger: 'blur' }],
+  managerId: [{ required: true, message: '请选择宿管', trigger: 'change' }]
 }
 
 const formatDate = (date) => {
@@ -227,16 +211,6 @@ const handleEdit = async (row) => {
   }
 }
 
-const handleView = async (row) => {
-  try {
-    const res = await getBuildingById(row.id)
-    detailData.value = res.data
-    detailVisible.value = true
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除该宿舍楼吗？', '提示', {
     confirmButtonText: '确定',
@@ -258,6 +232,10 @@ const handleManagerChange = (val) => {
   if (manager) {
     form.managerName = manager.realName
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

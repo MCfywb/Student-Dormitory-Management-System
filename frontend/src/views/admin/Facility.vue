@@ -68,7 +68,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="设施名称" prop="facilityName">
           <el-input v-model="form.facilityName" placeholder="请输入设施名称" />
@@ -278,6 +278,10 @@ const handleRoomChange = (val) => {
       form.roomNumber = room.roomNumber
     }
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

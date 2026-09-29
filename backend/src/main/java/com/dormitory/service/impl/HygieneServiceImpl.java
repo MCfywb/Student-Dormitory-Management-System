@@ -63,16 +63,26 @@ public class HygieneServiceImpl extends ServiceImpl<HygieneMapper, Hygiene> impl
 
     @Override
     public void addCheck(Hygiene hygiene) {
-        if (hygiene.getScore() >= 90) {
-            hygiene.setLevel("excellent");
-        } else if (hygiene.getScore() >= 80) {
-            hygiene.setLevel("good");
-        } else if (hygiene.getScore() >= 60) {
-            hygiene.setLevel("qualified");
-        } else {
-            hygiene.setLevel("unqualified");
-        }
+        hygiene.setLevel(calculateLevel(hygiene.getScore()));
         this.save(hygiene);
+    }
+
+    public void updateCheck(Hygiene hygiene) {
+        // 修改分数时同步重算等级，避免等级停留在修改前的旧值
+        if (hygiene.getScore() != null) {
+            hygiene.setLevel(calculateLevel(hygiene.getScore()));
+        }
+        this.updateById(hygiene);
+    }
+
+    private String calculateLevel(Integer score) {
+        if (score == null) {
+            return "unqualified";
+        }
+        if (score >= 90) return "excellent";
+        if (score >= 80) return "good";
+        if (score >= 60) return "qualified";
+        return "unqualified";
     }
 
     @Override

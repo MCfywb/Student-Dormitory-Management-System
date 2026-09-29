@@ -74,7 +74,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" title="新增费用" width="500px">
+    <el-dialog v-model="dialogVisible" title="新增费用" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="学生" prop="studentId">
           <el-select v-model="form.studentId" placeholder="请选择学生" style="width: 100%" filterable @change="handleStudentChange">
@@ -305,6 +305,10 @@ const handleFeeTypeChange = (val) => {
     form.feeTypeName = feeType.typeName
     form.amount = feeType.price
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

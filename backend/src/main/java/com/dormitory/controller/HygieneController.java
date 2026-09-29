@@ -71,7 +71,7 @@ public class HygieneController {
 
     @PutMapping
     public Result<Void> update(@RequestBody Hygiene hygiene) {
-        hygieneService.updateById(hygiene);
+        hygieneService.updateCheck(hygiene);
         return Result.success();
     }
 

@@ -67,7 +67,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" />
@@ -236,6 +236,10 @@ const handleDelete = (row) => {
       console.error(error)
     }
   }).catch(() => {})
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

@@ -20,6 +20,8 @@ public interface HygieneService extends IService<Hygiene> {
 
     void addCheck(Hygiene hygiene);
 
+    void updateCheck(Hygiene hygiene);
+
     Map<String, Object> getHygieneStats();
 
     List<Map<String, Object>> getRecentChecks(int limit);

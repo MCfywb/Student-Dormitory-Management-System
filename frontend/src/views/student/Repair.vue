@@ -23,7 +23,7 @@
       <el-table-column prop="handleResult" label="处理结果" show-overflow-tooltip />
     </el-table>
     
-    <el-dialog v-model="dialogVisible" title="新增报修" width="500px">
+    <el-dialog v-model="dialogVisible" title="新增报修" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="设施" prop="facilityId">
           <el-select v-model="form.facilityId" placeholder="请选择设施" style="width: 100%" @change="handleFacilityChange">
@@ -129,6 +129,10 @@ const handleFacilityChange = (val) => {
   if (facility) {
     form.facilityName = facility.facilityName
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

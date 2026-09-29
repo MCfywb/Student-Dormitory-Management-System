@@ -79,7 +79,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="房间号" prop="roomNumber">
           <el-input v-model="form.roomNumber" placeholder="请输入房间号" />
@@ -252,7 +252,10 @@ const rules = {
   roomNumber: [{ required: true, message: '请输入房间号', trigger: 'blur' }],
   buildingId: [{ required: true, message: '请选择所属楼栋', trigger: 'change' }],
   floor: [{ required: true, message: '请输入楼层', trigger: 'blur' }],
-  capacity: [{ required: true, message: '请输入床位容量', trigger: 'blur' }]
+  capacity: [{ required: true, message: '请输入床位容量', trigger: 'blur' }],
+  roomType: [{ required: true, message: '请选择房间类型', trigger: 'change' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
+  price: [{ required: true, message: '请输入费用', trigger: 'blur' }]
 }
 
 const bedList = computed(() => {
@@ -385,6 +388,10 @@ const handleBuildingChange = (val) => {
   if (building) {
     form.buildingName = building.buildingName
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

@@ -74,7 +74,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="dialogVisible" title="登记来访" width="600px">
+    <el-dialog v-model="dialogVisible" title="登记来访" width="600px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -291,6 +291,10 @@ const handleStudentChange = (val) => {
   if (student) {
     form.visitedStudentName = student.realName
   }
+}
+
+const handleDialogClosed = () => {
+  formRef.value?.clearValidate()
 }
 
 const handleSubmit = async () => {

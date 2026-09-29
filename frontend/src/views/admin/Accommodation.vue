@@ -12,11 +12,6 @@
         <el-form-item label="姓名">
           <el-input v-model="searchForm.realName" placeholder="请输入姓名" clearable />
         </el-form-item>
-        <el-form-item label="楼栋">
-          <el-select v-model="searchForm.buildingId" placeholder="请选择" clearable style="width: 200px">
-            <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="性别">
           <el-select v-model="searchForm.gender" placeholder="请选择" clearable style="width: 200px">
             <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -164,7 +159,6 @@ const pagination = reactive({
 const searchForm = reactive({
   studentNo: '',
   realName: '',
-  buildingId: null,
   gender: '',
   status: ''
 })
@@ -240,7 +234,6 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.studentNo = ''
   searchForm.realName = ''
-  searchForm.buildingId = null
   searchForm.gender = ''
   searchForm.status = ''
   handleSearch()
