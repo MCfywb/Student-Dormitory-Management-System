@@ -104,7 +104,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="房间" required>
-          <el-select v-model="assignForm.roomId" placeholder="请选择房间" @change="handleRoomChange" style="width: 100%">
+          <el-select v-model="assignForm.roomId" placeholder="请先选择楼栋" :disabled="!assignForm.buildingId" @change="handleRoomChange" style="width: 100%">
             <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" :disabled="item.availableBeds === 0 || item.status === 'maintenance'">
               <span>{{ item.roomNumber }}</span>
               <span v-if="item.status === 'maintenance'" style="float: right; color: #e6a23c; font-size: 12px;">维修中</span>
@@ -113,7 +113,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="床位" required>
-          <el-select v-model="assignForm.bedNumber" placeholder="请选择床位" style="width: 100%">
+          <el-select v-model="assignForm.bedNumber" placeholder="请先选择房间" :disabled="!assignForm.roomId" style="width: 100%">
             <el-option 
               v-for="bed in allBeds" 
               :key="bed.number" 
