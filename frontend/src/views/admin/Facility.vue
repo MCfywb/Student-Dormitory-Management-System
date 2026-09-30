@@ -12,6 +12,11 @@
         <el-form-item label="设施名称">
           <el-input v-model="searchForm.facilityName" placeholder="请输入设施名称" clearable />
         </el-form-item>
+        <el-form-item label="类型">
+          <el-select v-model="searchForm.facilityType" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in facilityTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="楼栋">
           <el-select v-model="searchForm.buildingId" placeholder="请选择" clearable style="width: 200px">
             <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
@@ -75,9 +80,7 @@
         </el-form-item>
         <el-form-item label="设施类型" prop="facilityType">
           <el-select v-model="form.facilityType" placeholder="请选择" style="width: 100%">
-            <el-option label="家具" value="furniture" />
-            <el-option label="电器" value="appliance" />
-            <el-option label="其他" value="other" />
+            <el-option v-for="item in facilityTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="所属房间" prop="roomId">
@@ -119,7 +122,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getFacilityPage, saveFacility, updateFacility, deleteFacility } from '@/api/facility'
+import { getFacilityPage, saveFacility, updateFacility, deleteFacility, getFacilityTypes } from '@/api/facility'
 import { getBuildingList } from '@/api/building'
 import { getRoomsByBuilding } from '@/api/room'
 
@@ -131,6 +134,20 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
 
+const facilityTypeOptions = ref([])
+
+const loadFacilityTypes = async () => {
+  try {
+    const res = await getFacilityTypes()
+    facilityTypeOptions.value = (res.data || []).map(type => ({
+      value: type,
+      label: getTypeText(type)
+    }))
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const pagination = reactive({
   current: 1,
   size: 10,
@@ -139,6 +156,7 @@ const pagination = reactive({
 
 const searchForm = reactive({
   facilityName: '',
+  facilityType: '',
   buildingId: null,
   status: ''
 })
@@ -160,7 +178,11 @@ const form = reactive({
 
 const rules = {
   facilityName: [{ required: true, message: '请输入设施名称', trigger: 'blur' }],
-  facilityType: [{ required: true, message: '请选择设施类型', trigger: 'change' }]
+  facilityType: [{ required: true, message: '请选择设施类型', trigger: 'change' }],
+  roomId: [{ required: true, message: '请选择所属房间', trigger: 'change' }],
+  purchaseDate: [{ required: true, message: '请选择购买日期', trigger: 'change' }],
+  price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
 
 const roomOptions = computed(() => {
@@ -231,6 +253,7 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.facilityName = ''
+  searchForm.facilityType = ''
   searchForm.buildingId = null
   searchForm.status = ''
   handleSearch()
@@ -321,6 +344,7 @@ const resetForm = () => {
 onMounted(() => {
   loadData()
   loadBuildings()
+  loadFacilityTypes()
 })
 </script>
 

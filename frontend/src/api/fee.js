@@ -44,6 +44,14 @@ export function getFeeTrend() {
   return request.get('/fee/trend')
 }
 
+export function getAcademicYears() {
+  return request.get('/fee/academicYears')
+}
+
+export function getSemesters() {
+  return request.get('/fee/semesters')
+}
+
 export function getFeeById(id) {
   return request.get(`/fee/${id}`)
 }

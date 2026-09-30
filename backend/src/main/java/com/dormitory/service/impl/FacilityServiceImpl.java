@@ -18,7 +18,7 @@ import java.util.*;
 public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, Facility> implements FacilityService {
 
     @Override
-    public Page<Facility> getPage(Integer current, Integer size, String facilityName, Long buildingId, String status) {
+    public Page<Facility> getPage(Integer current, Integer size, String facilityName, Long buildingId, String status, String facilityType) {
         Page<Facility> page = new Page<>(current, size);
         LambdaQueryWrapper<Facility> wrapper = new LambdaQueryWrapper<>();
         if (facilityName != null && !facilityName.isEmpty()) {
@@ -30,8 +30,28 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, Facility> i
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Facility::getStatus, status);
         }
+        if (facilityType != null && !facilityType.isEmpty()) {
+            wrapper.eq(Facility::getFacilityType, facilityType);
+        }
         wrapper.orderByDesc(Facility::getCreateTime);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public List<String> getFacilityTypes() {
+        LambdaQueryWrapper<Facility> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(Facility::getFacilityType)
+                .ne(Facility::getFacilityType, "")
+                .select(Facility::getFacilityType)
+                .groupBy(Facility::getFacilityType);
+        List<Facility> list = this.list(wrapper);
+        List<String> types = new ArrayList<>();
+        for (Facility facility : list) {
+            if (facility.getFacilityType() != null && !facility.getFacilityType().isEmpty()) {
+                types.add(facility.getFacilityType());
+            }
+        }
+        return types;
     }
 
     @Override

@@ -86,13 +86,13 @@ const formatDate = (date) => {
 }
 
 const getStatusType = (status) => {
-  const types = { pending: 'warning', processing: 'primary', completed: 'success', rejected: 'danger' }
-  return types[status] || ''
+  const types = { pending: 'warning', processing: 'primary', completed: 'success' }
+  return types[status]
 }
 
 const getStatusText = (status) => {
-  const texts = { pending: '待处理', processing: '处理中', completed: '已完成', rejected: '已拒绝' }
-  return texts[status] || status
+  const texts = { pending: '待处理', processing: '处理中', completed: '已完成' }
+  return texts[status]
 }
 
 const loadData = async () => {

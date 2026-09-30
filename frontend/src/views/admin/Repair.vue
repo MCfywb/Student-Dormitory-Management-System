@@ -14,7 +14,6 @@
             <el-option label="待处理" value="pending" />
             <el-option label="处理中" value="processing" />
             <el-option label="已完成" value="completed" />
-            <el-option label="已拒绝" value="rejected" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -44,7 +43,7 @@
       <el-table-column prop="repairCost" label="维修费用" width="100" />
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" link @click="handleProcess(row)" v-if="row.status === 'pending'">处理</el-button>
+          <el-button type="primary" link @click="handleProcess(row)" v-if="row.status === 'pending' || row.status === 'processing'">处理</el-button>
           <el-button type="primary" link @click="handleView(row)">详情</el-button>
         </template>
       </el-table-column>
@@ -65,9 +64,8 @@
       <el-form ref="processFormRef" :model="processForm" :rules="processRules" label-width="100px">
         <el-form-item label="处理结果" prop="status">
           <el-radio-group v-model="processForm.status">
-            <el-radio label="processing">处理中</el-radio>
+            <el-radio v-if="currentStatus !== 'processing'" label="processing">处理中</el-radio>
             <el-radio label="completed">已完成</el-radio>
-            <el-radio label="rejected">已拒绝</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="处理说明" prop="handleResult">
@@ -115,6 +113,7 @@ const detailVisible = ref(false)
 const processFormRef = ref(null)
 const detailData = ref({})
 const currentId = ref(null)
+const currentStatus = ref('')
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
 
@@ -137,7 +136,8 @@ const processForm = reactive({
 
 const processRules = {
   status: [{ required: true, message: '请选择处理结果', trigger: 'change' }],
-  handleResult: [{ required: true, message: '请输入处理说明', trigger: 'blur' }]
+  handleResult: [{ required: true, message: '请输入处理说明', trigger: 'blur' }],
+  repairCost: [{ required: true, message: '请输入维修费用', trigger: 'change' }]
 }
 
 const formatDate = (date) => {
@@ -146,13 +146,13 @@ const formatDate = (date) => {
 }
 
 const getStatusType = (status) => {
-  const types = { pending: 'warning', processing: 'primary', completed: 'success', rejected: 'danger' }
-  return types[status] || ''
+  const types = { pending: 'warning', processing: 'primary', completed: 'success' }
+  return types[status]
 }
 
 const getStatusText = (status) => {
-  const texts = { pending: '待处理', processing: '处理中', completed: '已完成', rejected: '已拒绝' }
-  return texts[status] || status
+  const texts = { pending: '待处理', processing: '处理中', completed: '已完成' }
+  return texts[status]
 }
 
 const loadData = async () => {
@@ -185,6 +185,7 @@ const handleReset = () => {
 
 const handleProcess = (row) => {
   currentId.value = row.id
+  currentStatus.value = row.status
   processForm.status = 'completed'
   processForm.handleResult = ''
   processForm.repairCost = 0

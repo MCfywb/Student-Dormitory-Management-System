@@ -16,6 +16,10 @@ export function getFacilityTypeStats() {
   return request.get('/facility/typeStats')
 }
 
+export function getFacilityTypes() {
+  return request.get('/facility/types')
+}
+
 export function getFacilityById(id) {
   return request.get(`/facility/${id}`)
 }

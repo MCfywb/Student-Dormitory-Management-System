@@ -197,7 +197,6 @@ public class FacilityRepairServiceImpl extends ServiceImpl<FacilityRepairMapper,
         int pending = 0;
         int processing = 0;
         int completed = 0;
-        int rejected = 0;
         
         for (FacilityRepair repair : allRepairs) {
             switch (repair.getStatus()) {
@@ -210,9 +209,6 @@ public class FacilityRepairServiceImpl extends ServiceImpl<FacilityRepairMapper,
                 case "completed":
                     completed++;
                     break;
-                case "rejected":
-                    rejected++;
-                    break;
             }
         }
         
@@ -220,7 +216,6 @@ public class FacilityRepairServiceImpl extends ServiceImpl<FacilityRepairMapper,
         result.put("pending", pending);
         result.put("processing", processing);
         result.put("completed", completed);
-        result.put("rejected", rejected);
         
         return result;
     }

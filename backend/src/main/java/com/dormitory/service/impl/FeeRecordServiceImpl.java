@@ -21,7 +21,7 @@ import java.util.*;
 public class FeeRecordServiceImpl extends ServiceImpl<FeeRecordMapper, FeeRecord> implements FeeRecordService {
 
     @Override
-    public Page<FeeRecord> getPage(Integer current, Integer size, String studentNo, String payStatus, String academicYear) {
+    public Page<FeeRecord> getPage(Integer current, Integer size, String studentNo, String payStatus, String academicYear, String studentName, Long feeTypeId, String semester) {
         Page<FeeRecord> page = new Page<>(current, size);
         LambdaQueryWrapper<FeeRecord> wrapper = new LambdaQueryWrapper<>();
         if (studentNo != null && !studentNo.isEmpty()) {
@@ -33,8 +33,53 @@ public class FeeRecordServiceImpl extends ServiceImpl<FeeRecordMapper, FeeRecord
         if (academicYear != null && !academicYear.isEmpty()) {
             wrapper.eq(FeeRecord::getAcademicYear, academicYear);
         }
+        if (studentName != null && !studentName.isEmpty()) {
+            wrapper.like(FeeRecord::getStudentName, studentName);
+        }
+        if (feeTypeId != null) {
+            wrapper.eq(FeeRecord::getFeeTypeId, feeTypeId);
+        }
+        if (semester != null && !semester.isEmpty()) {
+            wrapper.eq(FeeRecord::getSemester, semester);
+        }
         wrapper.orderByDesc(FeeRecord::getCreateTime);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public List<String> getAcademicYears() {
+        LambdaQueryWrapper<FeeRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(FeeRecord::getAcademicYear)
+                .ne(FeeRecord::getAcademicYear, "")
+                .select(FeeRecord::getAcademicYear)
+                .groupBy(FeeRecord::getAcademicYear)
+                .orderByDesc(FeeRecord::getAcademicYear);
+        List<FeeRecord> list = this.list(wrapper);
+        List<String> years = new ArrayList<>();
+        for (FeeRecord record : list) {
+            if (record.getAcademicYear() != null && !record.getAcademicYear().isEmpty()) {
+                years.add(record.getAcademicYear());
+            }
+        }
+        return years;
+    }
+
+    @Override
+    public List<String> getSemesters() {
+        LambdaQueryWrapper<FeeRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(FeeRecord::getSemester)
+                .ne(FeeRecord::getSemester, "")
+                .select(FeeRecord::getSemester)
+                .groupBy(FeeRecord::getSemester)
+                .orderByAsc(FeeRecord::getSemester);
+        List<FeeRecord> list = this.list(wrapper);
+        List<String> semesters = new ArrayList<>();
+        for (FeeRecord record : list) {
+            if (record.getSemester() != null && !record.getSemester().isEmpty()) {
+                semesters.add(record.getSemester());
+            }
+        }
+        return semesters;
     }
 
     @Override

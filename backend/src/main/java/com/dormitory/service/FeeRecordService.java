@@ -13,7 +13,11 @@ import java.util.Map;
  */
 public interface FeeRecordService extends IService<FeeRecord> {
 
-    Page<FeeRecord> getPage(Integer current, Integer size, String studentNo, String payStatus, String academicYear);
+    Page<FeeRecord> getPage(Integer current, Integer size, String studentNo, String payStatus, String academicYear, String studentName, Long feeTypeId, String semester);
+
+    List<String> getAcademicYears();
+
+    List<String> getSemesters();
 
     List<FeeRecord> getByStudentId(Long studentId);
 

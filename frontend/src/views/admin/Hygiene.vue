@@ -74,15 +74,15 @@
     
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close @closed="handleDialogClosed">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="楼栋" prop="buildingId">
-          <el-select v-model="form.buildingId" placeholder="请选择楼栋" style="width: 100%" @change="handleBuildingChange">
-            <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="房间" prop="roomId">
-          <el-select v-model="form.roomId" placeholder="请先选择楼栋" style="width: 100%" :disabled="!form.buildingId" @change="handleRoomChange">
-            <el-option v-for="item in roomList" :key="item.id" :label="item.roomNumber" :value="item.id" />
-          </el-select>
+        <el-form-item label="所属房间" prop="roomId">
+          <el-cascader
+            v-model="form.roomPath"
+            :options="roomOptions"
+            :props="{ value: 'id', label: 'name', children: 'children' }"
+            placeholder="请选择楼栋和房间"
+            style="width: 100%"
+            @change="handleRoomChange"
+          />
         </el-form-item>
         <el-form-item label="检查日期" prop="checkDate">
           <el-date-picker v-model="form.checkDate" type="date" placeholder="选择日期" style="width: 100%" value-format="YYYY-MM-DD" />
@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getHygienePage, saveHygiene, updateHygiene, deleteHygiene, getCheckerNames } from '@/api/hygiene'
 import { getBuildingList } from '@/api/building'
@@ -112,7 +112,7 @@ import { getRoomsByBuilding } from '@/api/room'
 const loading = ref(false)
 const tableData = ref([])
 const buildingList = ref([])
-const roomList = ref([])
+const roomMap = ref({})
 const checkerList = ref([])
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -137,6 +137,7 @@ const form = reactive({
   id: null,
   roomId: null,
   roomNumber: '',
+  roomPath: [],
   buildingId: null,
   buildingName: '',
   checkDate: '',
@@ -147,9 +148,19 @@ const form = reactive({
   remark: ''
 })
 
+const roomOptions = computed(() => {
+  return buildingList.value.map(building => ({
+    id: building.id,
+    name: building.buildingName,
+    children: (roomMap.value[building.id] || []).map(room => ({
+      id: room.id,
+      name: room.roomNumber
+    }))
+  }))
+})
+
 const rules = {
-  buildingId: [{ required: true, message: '请选择楼栋', trigger: 'change' }],
-  roomId: [{ required: true, message: '请选择房间', trigger: 'change' }],
+  roomId: [{ required: true, message: '请选择楼栋和房间', trigger: 'change' }],
   checkDate: [{ required: true, message: '请选择检查日期', trigger: 'change' }],
   score: [{ required: true, message: '请输入分数', trigger: 'blur' }]
 }
@@ -192,19 +203,16 @@ const loadBuildings = async () => {
   try {
     const res = await getBuildingList()
     buildingList.value = res.data
+    // 级联选择器需要完整的两级数据，逐栋取回房间
+    for (const building of buildingList.value) {
+      const roomsRes = await getRoomsByBuilding(building.id)
+      roomMap.value[building.id] = roomsRes.data
+    }
   } catch (error) {
     console.error(error)
   }
 }
 
-const loadRooms = async (buildingId) => {
-  try {
-    const res = await getRoomsByBuilding(buildingId)
-    roomList.value = res.data
-  } catch (error) {
-    console.error(error)
-  }
-}
 
 const loadCheckers = async () => {
   try {
@@ -237,10 +245,8 @@ const handleAdd = () => {
 const handleEdit = (row) => {
   dialogTitle.value = '编辑检查记录'
   Object.assign(form, row)
-  // 按该记录所属楼栋加载房间，保证房间下拉框能回显
-  if (row.buildingId) {
-    loadRooms(row.buildingId)
-  }
+  // 回填级联选择器的路径，保证所属房间能正确回显
+  form.roomPath = (row.buildingId && row.roomId) ? [row.buildingId, row.roomId] : []
   dialogVisible.value = true
 }
 
@@ -260,26 +266,16 @@ const handleDelete = (row) => {
   }).catch(() => {})
 }
 
-const handleBuildingChange = (buildingId) => {
-  const building = buildingList.value.find(item => item.id === buildingId)
-  if (building) {
-    form.buildingName = building.buildingName
-  }
-  // 切换楼栋后清空已选房间，并按新楼栋重新拉取房间列表
-  form.roomId = null
-  form.roomNumber = ''
-  roomList.value = []
-  if (buildingId) {
-    loadRooms(buildingId)
-  }
-}
-
 const handleRoomChange = (val) => {
-  const room = roomList.value.find(item => item.id === val)
-  if (room) {
-    form.roomNumber = room.roomNumber
-    form.buildingId = room.buildingId
-    form.buildingName = room.buildingName
+  if (val && val.length === 2) {
+    const building = buildingList.value.find(b => b.id === val[0])
+    const room = roomMap.value[val[0]]?.find(r => r.id === val[1])
+    if (building && room) {
+      form.buildingId = building.id
+      form.buildingName = building.buildingName
+      form.roomId = room.id
+      form.roomNumber = room.roomNumber
+    }
   }
 }
 
@@ -308,7 +304,7 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   form.id = null
-  roomList.value = []
+  form.roomPath = []
   form.roomId = null
   form.roomNumber = ''
   form.buildingId = null

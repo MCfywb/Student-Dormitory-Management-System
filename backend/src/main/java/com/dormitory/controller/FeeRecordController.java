@@ -27,8 +27,11 @@ public class FeeRecordController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String studentNo,
             @RequestParam(required = false) String payStatus,
-            @RequestParam(required = false) String academicYear) {
-        Page<FeeRecord> page = feeRecordService.getPage(current, size, studentNo, payStatus, academicYear);
+            @RequestParam(required = false) String academicYear,
+            @RequestParam(required = false) String studentName,
+            @RequestParam(required = false) Long feeTypeId,
+            @RequestParam(required = false) String semester) {
+        Page<FeeRecord> page = feeRecordService.getPage(current, size, studentNo, payStatus, academicYear, studentName, feeTypeId, semester);
         return Result.success(new PageResult<>(page));
     }
 
@@ -50,6 +53,16 @@ public class FeeRecordController {
     @GetMapping("/trend")
     public Result<Map<String, Object>> getFeeTrend() {
         return Result.success(feeRecordService.getFeeTrend());
+    }
+
+    @GetMapping("/academicYears")
+    public Result<List<String>> getAcademicYears() {
+        return Result.success(feeRecordService.getAcademicYears());
+    }
+
+    @GetMapping("/semesters")
+    public Result<List<String>> getSemesters() {
+        return Result.success(feeRecordService.getSemesters());
     }
 
     @GetMapping("/{id}")

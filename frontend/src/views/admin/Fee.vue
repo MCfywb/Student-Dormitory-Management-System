@@ -12,17 +12,29 @@
         <el-form-item label="学号">
           <el-input v-model="searchForm.studentNo" placeholder="请输入学号" clearable />
         </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="searchForm.studentName" placeholder="请输入姓名" clearable />
+        </el-form-item>
+        <el-form-item label="费用类型">
+          <el-select v-model="searchForm.feeTypeId" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in feeTypeList" :key="item.id" :label="item.typeName" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学年">
+          <el-select v-model="searchForm.academicYear" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in academicYearOptions" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学期">
+          <el-select v-model="searchForm.semester" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in semesterOptions" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="缴费状态">
           <el-select v-model="searchForm.payStatus" placeholder="请选择" clearable style="width: 200px">
             <el-option label="未支付" value="unpaid" />
             <el-option label="已支付" value="paid" />
             <el-option label="已逾期" value="overdue" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="学年">
-          <el-select v-model="searchForm.academicYear" placeholder="请选择" clearable style="width: 200px">
-            <el-option label="2023-2024" value="2023-2024" />
-            <el-option label="2024-2025" value="2024-2025" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -91,14 +103,12 @@
         </el-form-item>
         <el-form-item label="学年" prop="academicYear">
           <el-select v-model="form.academicYear" placeholder="请选择" style="width: 100%">
-            <el-option label="2023-2024" value="2023-2024" />
-            <el-option label="2024-2025" value="2024-2025" />
+            <el-option v-for="item in academicYearOptions" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item label="学期" prop="semester">
           <el-select v-model="form.semester" placeholder="请选择" style="width: 100%">
-            <el-option label="第一学期" value="第一学期" />
-            <el-option label="第二学期" value="第二学期" />
+            <el-option v-for="item in semesterOptions" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item label="应缴日期" prop="dueDate">
@@ -139,13 +149,33 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getFeePage, saveFee, deleteFee, payFee } from '@/api/fee'
+import { getFeePage, saveFee, deleteFee, payFee, getAcademicYears, getSemesters } from '@/api/fee'
 import { getFeeTypeList } from '@/api/fee'
 import { getStudentPage } from '@/api/student'
 
 const loading = ref(false)
 const tableData = ref([])
 const studentList = ref([])
+const academicYearOptions = ref([])
+const semesterOptions = ref([])
+
+const loadAcademicYears = async () => {
+  try {
+    const res = await getAcademicYears()
+    academicYearOptions.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const loadSemesters = async () => {
+  try {
+    const res = await getSemesters()
+    semesterOptions.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  }
+}
 const feeTypeList = ref([])
 const dialogVisible = ref(false)
 const payVisible = ref(false)
@@ -160,8 +190,11 @@ const pagination = reactive({
 
 const searchForm = reactive({
   studentNo: '',
+  studentName: '',
+  feeTypeId: null,
   payStatus: '',
-  academicYear: ''
+  academicYear: '',
+  semester: ''
 })
 
 const form = reactive({
@@ -247,8 +280,11 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.studentNo = ''
+  searchForm.studentName = ''
+  searchForm.feeTypeId = null
   searchForm.payStatus = ''
   searchForm.academicYear = ''
+  searchForm.semester = ''
   handleSearch()
 }
 
@@ -342,6 +378,8 @@ onMounted(() => {
   loadData()
   loadStudents()
   loadFeeTypes()
+  loadAcademicYears()
+  loadSemesters()
 })
 </script>
 

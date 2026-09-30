@@ -27,9 +27,15 @@ public class FacilityController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String facilityName,
             @RequestParam(required = false) Long buildingId,
-            @RequestParam(required = false) String status) {
-        Page<Facility> page = facilityService.getPage(current, size, facilityName, buildingId, status);
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String facilityType) {
+        Page<Facility> page = facilityService.getPage(current, size, facilityName, buildingId, status, facilityType);
         return Result.success(new PageResult<>(page));
+    }
+
+    @GetMapping("/types")
+    public Result<List<String>> getFacilityTypes() {
+        return Result.success(facilityService.getFacilityTypes());
     }
 
     @GetMapping("/room/{roomId}")

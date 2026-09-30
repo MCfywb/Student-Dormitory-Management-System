@@ -310,7 +310,7 @@ CREATE TABLE facility_repair (
     reporter_name VARCHAR(50) COMMENT '报修人姓名',
     report_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '报修时间',
     problem_desc VARCHAR(500) COMMENT '问题描述',
-    status VARCHAR(20) DEFAULT 'pending' COMMENT '状态: pending-待处理, processing-处理中, completed-已完成, rejected-已拒绝',
+    status VARCHAR(20) DEFAULT 'pending' COMMENT '状态: pending-待处理, processing-处理中, completed-已完成',
     handler_id BIGINT COMMENT '处理人ID',
     handler_name VARCHAR(50) COMMENT '处理人姓名',
     handle_time DATETIME COMMENT '处理时间',
