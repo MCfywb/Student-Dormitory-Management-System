@@ -33,7 +33,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, Facility> i
         if (facilityType != null && !facilityType.isEmpty()) {
             wrapper.eq(Facility::getFacilityType, facilityType);
         }
-        wrapper.orderByDesc(Facility::getCreateTime);
+        wrapper.orderByAsc(Facility::getId);
         return this.page(page, wrapper);
     }
 

@@ -63,7 +63,7 @@
     <el-dialog v-model="processVisible" title="处理维修" width="500px">
       <el-form ref="processFormRef" :model="processForm" :rules="processRules" label-width="100px">
         <el-form-item label="处理结果" prop="status">
-          <el-radio-group v-model="processForm.status">
+          <el-radio-group v-model="processForm.status" @change="handleStatusChange">
             <el-radio v-if="currentStatus !== 'processing'" label="processing">处理中</el-radio>
             <el-radio label="completed">已完成</el-radio>
           </el-radio-group>
@@ -190,6 +190,15 @@ const handleProcess = (row) => {
   processForm.handleResult = ''
   processForm.repairCost = 0
   processVisible.value = true
+}
+
+const handleStatusChange = (val) => {
+  // 选「处理中」时预填说明，选「已完成」时清空；均不覆盖手动输入的内容
+  if (val === 'processing' && !processForm.handleResult) {
+    processForm.handleResult = '正在联系维修人员'
+  } else if (val === 'completed' && processForm.handleResult === '正在联系维修人员') {
+    processForm.handleResult = ''
+  }
 }
 
 const handleView = async (row) => {
