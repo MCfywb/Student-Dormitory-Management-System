@@ -1,7 +1,7 @@
 package com.dormitory.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.dormitory.entity.Hygiene;
 
 import java.util.List;
