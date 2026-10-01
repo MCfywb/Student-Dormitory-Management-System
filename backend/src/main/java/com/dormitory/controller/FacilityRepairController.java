@@ -25,9 +25,12 @@ public class FacilityRepairController {
     public Result<PageResult<FacilityRepair>> getPage(
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(required = false) String roomNumber,
-            @RequestParam(required = false) String status) {
-        Page<FacilityRepair> page = repairService.getPage(current, size, roomNumber, status);
+            @RequestParam(required = false) Long roomId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String facilityName,
+            @RequestParam(required = false) String reporterName,
+            @RequestParam(required = false) String handlerName) {
+        Page<FacilityRepair> page = repairService.getPage(current, size, roomId, status, facilityName, reporterName, handlerName);
         return Result.success(new PageResult<>(page));
     }
 

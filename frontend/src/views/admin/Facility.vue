@@ -17,10 +17,16 @@
             <el-option v-for="item in facilityTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="楼栋">
-          <el-select v-model="searchForm.buildingId" placeholder="请选择" clearable style="width: 200px">
-            <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.id" />
-          </el-select>
+        <el-form-item label="房间">
+          <el-cascader
+            v-model="searchRoomPath"
+            :options="roomOptions"
+            :props="{ value: 'id', label: 'name', children: 'children' }"
+            placeholder="请选择楼栋和房间"
+            clearable
+            style="width: 260px"
+            @change="handleSearchRoomChange"
+          />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
@@ -154,12 +160,18 @@ const pagination = reactive({
   total: 0
 })
 
+const searchRoomPath = ref([])
+
 const searchForm = reactive({
   facilityName: '',
   facilityType: '',
-  buildingId: null,
+  roomId: null,
   status: ''
 })
+
+const handleSearchRoomChange = (val) => {
+  searchForm.roomId = (val && val.length === 2) ? val[1] : null
+}
 
 const form = reactive({
   id: null,
@@ -254,7 +266,8 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.facilityName = ''
   searchForm.facilityType = ''
-  searchForm.buildingId = null
+  searchForm.roomId = null
+  searchRoomPath.value = []
   searchForm.status = ''
   handleSearch()
 }

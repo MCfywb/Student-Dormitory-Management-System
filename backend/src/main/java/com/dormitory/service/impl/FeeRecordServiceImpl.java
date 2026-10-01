@@ -42,7 +42,7 @@ public class FeeRecordServiceImpl extends ServiceImpl<FeeRecordMapper, FeeRecord
         if (semester != null && !semester.isEmpty()) {
             wrapper.eq(FeeRecord::getSemester, semester);
         }
-        wrapper.orderByDesc(FeeRecord::getCreateTime);
+        wrapper.orderByAsc(FeeRecord::getId);
         return this.page(page, wrapper);
     }
 

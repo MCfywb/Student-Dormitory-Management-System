@@ -31,8 +31,9 @@ public class StudentInfoController {
             @RequestParam(required = false) Long buildingId,
             @RequestParam(required = false) String gender,
             @RequestParam(required = false) String grade,
-            @RequestParam(required = false) String status) {
-        Page<StudentInfo> page = studentInfoService.getPage(current, size, studentNo, realName, college, buildingId, gender, grade, status);
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long roomId) {
+        Page<StudentInfo> page = studentInfoService.getPage(current, size, studentNo, realName, college, buildingId, gender, grade, status, roomId);
         return Result.success(new PageResult<>(page));
     }
 

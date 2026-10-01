@@ -42,14 +42,23 @@ public class FacilityRepairServiceImpl extends ServiceImpl<FacilityRepairMapper,
     private StudentInfoMapper studentInfoMapper;
 
     @Override
-    public Page<FacilityRepair> getPage(Integer current, Integer size, String roomNumber, String status) {
+    public Page<FacilityRepair> getPage(Integer current, Integer size, Long roomId, String status, String facilityName, String reporterName, String handlerName) {
         Page<FacilityRepair> page = new Page<>(current, size);
         LambdaQueryWrapper<FacilityRepair> wrapper = new LambdaQueryWrapper<>();
-        if (roomNumber != null && !roomNumber.isEmpty()) {
-            wrapper.like(FacilityRepair::getRoomNumber, roomNumber);
+        if (facilityName != null && !facilityName.isEmpty()) {
+            wrapper.like(FacilityRepair::getFacilityName, facilityName);
+        }
+        if (roomId != null) {
+            wrapper.eq(FacilityRepair::getRoomId, roomId);
+        }
+        if (reporterName != null && !reporterName.isEmpty()) {
+            wrapper.like(FacilityRepair::getReporterName, reporterName);
         }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(FacilityRepair::getStatus, status);
+        }
+        if (handlerName != null && !handlerName.isEmpty()) {
+            wrapper.like(FacilityRepair::getHandlerName, handlerName);
         }
         wrapper.orderByDesc(FacilityRepair::getReportTime);
         return this.page(page, wrapper);
@@ -82,7 +91,8 @@ public class FacilityRepairServiceImpl extends ServiceImpl<FacilityRepairMapper,
         repair.setHandlerId(handlerId);
         repair.setHandlerName(handlerName);
         repair.setHandleTime(LocalDateTime.now());
-        if (repairCost != null) {
+        // 仅「已完成」才写入维修费用，处理中保持原值不变
+        if (repairCost != null && "completed".equals(status)) {
             repair.setRepairCost(repairCost);
         }
         this.updateById(repair);

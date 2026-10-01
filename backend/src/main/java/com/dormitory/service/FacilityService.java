@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface FacilityService extends IService<Facility> {
 
-    Page<Facility> getPage(Integer current, Integer size, String facilityName, Long buildingId, String status, String facilityType);
+    Page<Facility> getPage(Integer current, Integer size, String facilityName, String status, String facilityType, Long roomId);
 
     List<String> getFacilityTypes();
 

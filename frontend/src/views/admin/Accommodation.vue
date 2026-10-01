@@ -17,6 +17,17 @@
             <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
+        <el-form-item label="房间">
+          <el-cascader
+            v-model="searchRoomPath"
+            :options="roomOptions"
+            :props="{ value: 'id', label: 'name', children: 'children' }"
+            placeholder="请选择楼栋和房间"
+            clearable
+            style="width: 260px"
+            @change="handleSearchRoomChange"
+          />
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
             <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -149,6 +160,19 @@ const detailVisible = ref(false)
 const detailData = ref({})
 const assignVisible = ref(false)
 const roomList = ref([])
+const roomMap = ref({})
+const searchRoomPath = ref([])
+
+const roomOptions = computed(() => {
+  return buildingList.value.map(building => ({
+    id: building.id,
+    name: building.buildingName,
+    children: (roomMap.value[building.id] || []).map(room => ({
+      id: room.id,
+      name: room.roomNumber
+    }))
+  }))
+})
 
 const pagination = reactive({
   current: 1,
@@ -159,9 +183,14 @@ const pagination = reactive({
 const searchForm = reactive({
   studentNo: '',
   realName: '',
+  roomId: null,
   gender: '',
   status: ''
 })
+
+const handleSearchRoomChange = (val) => {
+  searchForm.roomId = (val && val.length === 2) ? val[1] : null
+}
 
 const genderOptions = ref([
   { value: '男', label: '男' },
@@ -221,6 +250,11 @@ const loadBuildings = async () => {
   try {
     const res = await getBuildingList()
     buildingList.value = res.data
+    // 级联选择器需要完整的两级数据，逐栋取回房间
+    for (const building of buildingList.value) {
+      const roomsRes = await getRoomsByBuilding(building.id)
+      roomMap.value[building.id] = roomsRes.data
+    }
   } catch (error) {
     console.error(error)
   }
@@ -234,6 +268,8 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.studentNo = ''
   searchForm.realName = ''
+  searchForm.roomId = null
+  searchRoomPath.value = []
   searchForm.gender = ''
   searchForm.status = ''
   handleSearch()

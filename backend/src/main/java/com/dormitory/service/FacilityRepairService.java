@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface FacilityRepairService extends IService<FacilityRepair> {
 
-    Page<FacilityRepair> getPage(Integer current, Integer size, String roomNumber, String status);
+    Page<FacilityRepair> getPage(Integer current, Integer size, Long roomId, String status, String facilityName, String reporterName, String handlerName);
 
     void addRepair(FacilityRepair repair);
 

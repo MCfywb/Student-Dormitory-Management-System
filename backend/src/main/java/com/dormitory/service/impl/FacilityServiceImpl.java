@@ -18,14 +18,14 @@ import java.util.*;
 public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, Facility> implements FacilityService {
 
     @Override
-    public Page<Facility> getPage(Integer current, Integer size, String facilityName, Long buildingId, String status, String facilityType) {
+    public Page<Facility> getPage(Integer current, Integer size, String facilityName, String status, String facilityType, Long roomId) {
         Page<Facility> page = new Page<>(current, size);
         LambdaQueryWrapper<Facility> wrapper = new LambdaQueryWrapper<>();
         if (facilityName != null && !facilityName.isEmpty()) {
             wrapper.like(Facility::getFacilityName, facilityName);
         }
-        if (buildingId != null) {
-            wrapper.eq(Facility::getBuildingId, buildingId);
+        if (roomId != null) {
+            wrapper.eq(Facility::getRoomId, roomId);
         }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Facility::getStatus, status);

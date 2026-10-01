@@ -6,8 +6,22 @@
     
     <div class="search-form">
       <el-form :inline="true" :model="searchForm">
-        <el-form-item label="房间号">
-          <el-input v-model="searchForm.roomNumber" placeholder="请输入房间号" clearable />
+        <el-form-item label="设施名称">
+          <el-input v-model="searchForm.facilityName" placeholder="请输入设施名称" clearable />
+        </el-form-item>
+        <el-form-item label="房间">
+          <el-cascader
+            v-model="searchRoomPath"
+            :options="roomOptions"
+            :props="{ value: 'id', label: 'name', children: 'children' }"
+            placeholder="请选择楼栋和房间"
+            clearable
+            style="width: 260px"
+            @change="handleSearchRoomChange"
+          />
+        </el-form-item>
+        <el-form-item label="报修人">
+          <el-input v-model="searchForm.reporterName" placeholder="请输入报修人" clearable />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
@@ -15,6 +29,9 @@
             <el-option label="处理中" value="processing" />
             <el-option label="已完成" value="completed" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="处理人">
+          <el-input v-model="searchForm.handlerName" placeholder="请输入处理人" clearable />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -60,7 +77,7 @@
       style="margin-top: 20px; display: flex; justify-content: flex-end;"
     />
     
-    <el-dialog v-model="processVisible" title="处理维修" width="500px">
+    <el-dialog v-model="processVisible" title="处理维修" width="500px" destroy-on-close @closed="handleProcessDialogClosed">
       <el-form ref="processFormRef" :model="processForm" :rules="processRules" label-width="100px">
         <el-form-item label="处理结果" prop="status">
           <el-radio-group v-model="processForm.status" @change="handleStatusChange">
@@ -102,12 +119,29 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getRepairPage, handleRepair, getRepairById } from '@/api/repair'
+import { getBuildingList } from '@/api/building'
+import { getRoomsByBuilding } from '@/api/room'
 
 const loading = ref(false)
 const tableData = ref([])
+const buildingList = ref([])
+const roomMap = ref({})
+const searchRoomPath = ref([])
+
+const roomOptions = computed(() => {
+  return buildingList.value.map(building => ({
+    id: building.id,
+    name: building.buildingName,
+    children: (roomMap.value[building.id] || []).map(room => ({
+      id: room.id,
+      name: room.roomNumber
+    }))
+  }))
+})
+
 const processVisible = ref(false)
 const detailVisible = ref(false)
 const processFormRef = ref(null)
@@ -124,9 +158,16 @@ const pagination = reactive({
 })
 
 const searchForm = reactive({
-  roomNumber: '',
-  status: ''
+  facilityName: '',
+  roomId: null,
+  reporterName: '',
+  status: '',
+  handlerName: ''
 })
+
+const handleSearchRoomChange = (val) => {
+  searchForm.roomId = (val && val.length === 2) ? val[1] : null
+}
 
 const processForm = reactive({
   status: 'completed',
@@ -178,17 +219,23 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.roomNumber = ''
+  searchForm.facilityName = ''
+  searchForm.roomId = null
+  searchRoomPath.value = []
+  searchForm.reporterName = ''
   searchForm.status = ''
+  searchForm.handlerName = ''
   handleSearch()
 }
 
 const handleProcess = (row) => {
   currentId.value = row.id
   currentStatus.value = row.status
-  processForm.status = 'completed'
   processForm.handleResult = ''
   processForm.repairCost = 0
+  // 默认选中「处理中」；已是处理中的记录该选项会隐藏，只能选「已完成」
+  processForm.status = row.status === 'processing' ? 'completed' : 'processing'
+  handleStatusChange(processForm.status)
   processVisible.value = true
 }
 
@@ -199,6 +246,12 @@ const handleStatusChange = (val) => {
   } else if (val === 'completed' && processForm.handleResult === '正在联系维修人员') {
     processForm.handleResult = ''
   }
+  // 切换后清除残留的校验提示，否则已填好的字段仍挂着旧红字
+  processFormRef.value?.clearValidate()
+}
+
+const handleProcessDialogClosed = () => {
+  processFormRef.value?.clearValidate()
 }
 
 const handleView = async (row) => {
@@ -222,7 +275,8 @@ const handleSubmitProcess = async () => {
       processForm.handleResult,
       userInfo.id,
       userInfo.realName,
-      processForm.repairCost
+      // 仅「已完成」才提交维修费用，处理中不传
+      processForm.status === 'completed' ? processForm.repairCost : null
     )
     ElMessage.success('处理成功')
     processVisible.value = false
@@ -232,8 +286,23 @@ const handleSubmitProcess = async () => {
   }
 }
 
+const loadBuildings = async () => {
+  try {
+    const res = await getBuildingList()
+    buildingList.value = res.data
+    // 级联选择器需要完整的两级数据，逐栋取回房间
+    for (const building of buildingList.value) {
+      const roomsRes = await getRoomsByBuilding(building.id)
+      roomMap.value[building.id] = roomsRes.data
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   loadData()
+  loadBuildings()
 })
 </script>
 

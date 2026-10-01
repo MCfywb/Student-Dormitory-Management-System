@@ -26,10 +26,10 @@ public class FacilityController {
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String facilityName,
-            @RequestParam(required = false) Long buildingId,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String facilityType) {
-        Page<Facility> page = facilityService.getPage(current, size, facilityName, buildingId, status, facilityType);
+            @RequestParam(required = false) String facilityType,
+            @RequestParam(required = false) Long roomId) {
+        Page<Facility> page = facilityService.getPage(current, size, facilityName, status, facilityType, roomId);
         return Result.success(new PageResult<>(page));
     }
 
