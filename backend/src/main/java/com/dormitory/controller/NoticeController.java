@@ -26,9 +26,21 @@ public class NoticeController {
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) String noticeType) {
-        Page<Notice> page = noticeService.getPage(current, size, title, noticeType);
+            @RequestParam(required = false) String noticeType,
+            @RequestParam(required = false) String publisherName,
+            @RequestParam(required = false) Integer status) {
+        Page<Notice> page = noticeService.getPage(current, size, title, noticeType, publisherName, status);
         return Result.success(new PageResult<>(page));
+    }
+
+    @GetMapping("/publishers")
+    public Result<List<String>> getPublisherNames() {
+        return Result.success(noticeService.getPublisherNames());
+    }
+
+    @GetMapping("/statuses")
+    public Result<List<Integer>> getStatuses() {
+        return Result.success(noticeService.getStatuses());
     }
 
     @GetMapping("/list")

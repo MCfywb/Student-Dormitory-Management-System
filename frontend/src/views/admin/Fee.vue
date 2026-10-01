@@ -215,7 +215,8 @@ const rules = {
   feeTypeId: [{ required: true, message: '请选择费用类型', trigger: 'change' }],
   amount: [{ required: true, message: '请输入金额', trigger: 'blur' }],
   academicYear: [{ required: true, message: '请选择学年', trigger: 'change' }],
-  semester: [{ required: true, message: '请选择学期', trigger: 'change' }]
+  semester: [{ required: true, message: '请选择学期', trigger: 'change' }],
+  dueDate: [{ required: true, message: '请选择应缴日期', trigger: 'change' }]
 }
 
 const formatDate = (date) => {

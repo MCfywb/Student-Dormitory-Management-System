@@ -19,7 +19,7 @@ import java.util.*;
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     @Override
-    public Page<Notice> getPage(Integer current, Integer size, String title, String noticeType) {
+    public Page<Notice> getPage(Integer current, Integer size, String title, String noticeType, String publisherName, Integer status) {
         Page<Notice> page = new Page<>(current, size);
         LambdaQueryWrapper<Notice> wrapper = new LambdaQueryWrapper<>();
         if (title != null && !title.isEmpty()) {
@@ -28,8 +28,49 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         if (noticeType != null && !noticeType.isEmpty()) {
             wrapper.eq(Notice::getNoticeType, noticeType);
         }
-        wrapper.orderByDesc(Notice::getPublishTime);
+        if (publisherName != null && !publisherName.isEmpty()) {
+            wrapper.like(Notice::getPublisherName, publisherName);
+        }
+        if (status != null) {
+            wrapper.eq(Notice::getStatus, status);
+        }
+        wrapper.orderByDesc(Notice::getId);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public List<String> getPublisherNames() {
+        LambdaQueryWrapper<Notice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(Notice::getPublisherName)
+                .ne(Notice::getPublisherName, "")
+                .select(Notice::getPublisherName)
+                .groupBy(Notice::getPublisherName)
+                .orderByAsc(Notice::getPublisherName);
+        List<Notice> list = this.list(wrapper);
+        List<String> names = new ArrayList<>();
+        for (Notice notice : list) {
+            if (notice.getPublisherName() != null && !notice.getPublisherName().isEmpty()) {
+                names.add(notice.getPublisherName());
+            }
+        }
+        return names;
+    }
+
+    @Override
+    public List<Integer> getStatuses() {
+        LambdaQueryWrapper<Notice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNotNull(Notice::getStatus)
+                .select(Notice::getStatus)
+                .groupBy(Notice::getStatus)
+                .orderByDesc(Notice::getStatus);
+        List<Notice> list = this.list(wrapper);
+        List<Integer> statuses = new ArrayList<>();
+        for (Notice notice : list) {
+            if (notice.getStatus() != null) {
+                statuses.add(notice.getStatus());
+            }
+        }
+        return statuses;
     }
 
     @Override

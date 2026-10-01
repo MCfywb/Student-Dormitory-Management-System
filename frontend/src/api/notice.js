@@ -12,6 +12,14 @@ export function getNoticeStats() {
   return request.get('/notice/stats')
 }
 
+export function getPublisherNames() {
+  return request.get('/notice/publishers')
+}
+
+export function getStatuses() {
+  return request.get('/notice/statuses')
+}
+
 export function getNoticeById(id) {
   return request.get(`/notice/${id}`)
 }

@@ -19,6 +19,16 @@
             <el-option label="警告" value="warning" />
           </el-select>
         </el-form-item>
+        <el-form-item label="发布人">
+          <el-select v-model="searchForm.publisherName" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in publisherOptions" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -113,10 +123,35 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getNoticePage, saveNotice, updateNotice, deleteNotice, getNoticeById } from '@/api/notice'
+import { getNoticePage, saveNotice, updateNotice, deleteNotice, getNoticeById, getPublisherNames, getStatuses } from '@/api/notice'
 
 const loading = ref(false)
 const tableData = ref([])
+const publisherOptions = ref([])
+const statusOptions = ref([])
+
+const loadPublisherNames = async () => {
+  try {
+    const res = await getPublisherNames()
+    publisherOptions.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const loadStatuses = async () => {
+  try {
+    const res = await getStatuses()
+    // 后端返回 0/1，转换成带中文标签的选项
+    statusOptions.value = (res.data || []).map(value => ({
+      value,
+      label: value === 1 ? '已发布' : '草稿'
+    }))
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const dialogVisible = ref(false)
 const detailVisible = ref(false)
 const dialogTitle = ref('')
@@ -133,7 +168,9 @@ const pagination = reactive({
 
 const searchForm = reactive({
   title: '',
-  noticeType: ''
+  noticeType: '',
+  publisherName: '',
+  status: null
 })
 
 const form = reactive({
@@ -192,6 +229,8 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.title = ''
   searchForm.noticeType = ''
+  searchForm.publisherName = ''
+  searchForm.status = null
   handleSearch()
 }
 
@@ -273,6 +312,8 @@ const resetForm = () => {
 
 onMounted(() => {
   loadData()
+  loadPublisherNames()
+  loadStatuses()
 })
 </script>
 

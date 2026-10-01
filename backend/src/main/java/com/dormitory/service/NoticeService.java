@@ -12,7 +12,11 @@ import java.util.Map;
  */
 public interface NoticeService extends IService<Notice> {
 
-    Page<Notice> getPage(Integer current, Integer size, String title, String noticeType);
+    Page<Notice> getPage(Integer current, Integer size, String title, String noticeType, String publisherName, Integer status);
+
+    List<String> getPublisherNames();
+
+    List<Integer> getStatuses();
 
     List<Notice> getPublishedList(int limit);
 
