@@ -16,25 +16,25 @@
 
 | 技术 | 版本 |
 |------|------|
-| Spring Boot | 2.7.18 |
-| JDK | 1.8 |
-| Maven | 3.x |
-| MyBatis-Plus | 3.5.3.1 |
-| MySQL | 8.x |
-| JJWT | 0.9.1 |
-| Lombok | - |
+| Spring Boot | 4.1.1 |
+| JDK | 25 |
+| Maven | 3.9.16 |
+| MyBatis-Plus | 3.5.17 |
+| MySQL | 26.7.0 |
+| JJWT | 0.13.0 |
+| Lombok | 1.18.48 |
 
 ### 前端
 
 | 技术 | 版本 |
 |------|------|
-| Vue | 3.3.4 |
-| Vite | 4.4.9 |
-| Element Plus | 2.4.1 |
-| Pinia | 2.1.7 |
-| Vue Router | 4.2.5 |
-| Axios | 1.5.1 |
-| ECharts | 5.4.3 |
+| Vue | 3.5.43 |
+| Vite | 8.3.2 |
+| Element Plus | 2.14.7 |
+| Pinia | 4.0.3 |
+| Vue Router | 5.3.1 |
+| Axios | 1.20.0 |
+| ECharts | 6.1.0 |
 
 ---
 
@@ -193,10 +193,10 @@ DormitoryManagementSystem
 
 ### 环境要求
 
-- JDK 1.8+
-- Maven 3.x
-- MySQL 8.x
-- Node.js 16+
+- JDK 25+
+- Maven 3.9.16
+- MySQL 26.7.0
+- Node.js 26+
 - npm / pnpm
 
 ### 1. 数据库初始化
@@ -231,7 +231,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-后端服务默认启动在 `http://localhost:8000/api`
+后端服务默认启动在 `http://localhost:8080/api`
 
 ### 4. 启动前端
 
@@ -241,7 +241,7 @@ npm install
 npm run dev
 ```
 
-前端服务默认启动在 `http://localhost:9000`
+前端服务默认启动在 `http://localhost:5173`
 
 ---
 
@@ -272,11 +272,3 @@ npm run dev
 | `visitor` | 来访登记表 |
 
 ---
-
-## 📜 开源协议
-
-[MIT](LICENSE)
-
-## ⚠️ 免责声明
-
-本项目仅作为学习参考和技术交流使用。项目中包含的测试数据（如学生姓名、学号、联系方式等）均为虚构，如有雷同，纯属巧合。
