@@ -158,10 +158,6 @@ const routes = [
         meta: { title: '个人中心', requiresAuth: true }
       }
     ]
-  },
-  {
-    path: '/',
-    redirect: '/login'
   }
 ]
 
