@@ -12,10 +12,19 @@
         <el-form-item label="来访人">
           <el-input v-model="searchForm.visitorName" placeholder="请输入来访人姓名" clearable />
         </el-form-item>
-        <el-form-item label="楼栋">
-          <el-select v-model="searchForm.buildingName" placeholder="请选择" clearable style="width: 200px">
-            <el-option v-for="item in buildingList" :key="item.id" :label="item.buildingName" :value="item.buildingName" />
-          </el-select>
+        <el-form-item label="手机号">
+          <el-input v-model="searchForm.visitorPhone" placeholder="请输入手机号" clearable />
+        </el-form-item>
+        <el-form-item label="访问房间">
+          <el-cascader
+            v-model="searchRoomPath"
+            :options="roomOptions"
+            :props="{ value: 'id', label: 'name', children: 'children' }"
+            placeholder="请选择楼栋和房间"
+            clearable
+            style="width: 260px"
+            @change="handleSearchRoomChange"
+          />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
@@ -128,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getVisitorPage, saveVisitor, leaveVisitor, deleteVisitor } from '@/api/visitor'
 import { getBuildingList } from '@/api/building'
@@ -140,6 +149,19 @@ const tableData = ref([])
 const buildingList = ref([])
 const roomList = ref([])
 const studentList = ref([])
+const roomMap = ref({})
+const searchRoomPath = ref([])
+
+const roomOptions = computed(() => {
+  return buildingList.value.map(building => ({
+    id: building.id,
+    name: building.buildingName,
+    children: (roomMap.value[building.id] || []).map(room => ({
+      id: room.id,
+      name: room.roomNumber
+    }))
+  }))
+})
 const dialogVisible = ref(false)
 const formRef = ref(null)
 
@@ -153,9 +175,14 @@ const pagination = reactive({
 
 const searchForm = reactive({
   visitorName: '',
-  buildingName: '',
+  visitorPhone: '',
+  roomId: null,
   status: ''
 })
+
+const handleSearchRoomChange = (val) => {
+  searchForm.roomId = (val && val.length === 2) ? val[1] : null
+}
 
 const form = reactive({
   visitorName: '',
@@ -176,7 +203,10 @@ const form = reactive({
 const rules = {
   visitorName: [{ required: true, message: '请输入来访人姓名', trigger: 'blur' }],
   visitorPhone: [{ required: true, message: '请输入联系电话', trigger: 'blur' }],
+  visitorIdCard: [{ required: true, message: '请输入身份证号', trigger: 'blur' }],
   buildingId: [{ required: true, message: '请选择访问楼栋', trigger: 'change' }],
+  roomId: [{ required: true, message: '请选择访问房间', trigger: 'change' }],
+  visitedStudentId: [{ required: true, message: '请选择被访学生', trigger: 'change' }],
   visitReason: [{ required: true, message: '请输入来访事由', trigger: 'blur' }]
 }
 
@@ -206,6 +236,11 @@ const loadBuildings = async () => {
   try {
     const res = await getBuildingList()
     buildingList.value = res.data
+    // 级联选择器需要完整的两级数据，逐栋取回房间
+    for (const building of buildingList.value) {
+      const roomsRes = await getRoomsByBuilding(building.id)
+      roomMap.value[building.id] = roomsRes.data
+    }
   } catch (error) {
     console.error(error)
   }
@@ -218,7 +253,9 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.visitorName = ''
-  searchForm.buildingName = ''
+  searchForm.visitorPhone = ''
+  searchForm.roomId = null
+  searchRoomPath.value = []
   searchForm.status = ''
   handleSearch()
 }

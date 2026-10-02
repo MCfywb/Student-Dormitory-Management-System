@@ -25,9 +25,10 @@ public class VisitorController {
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String visitorName,
-            @RequestParam(required = false) String buildingName,
+            @RequestParam(required = false) String visitorPhone,
+            @RequestParam(required = false) Long roomId,
             @RequestParam(required = false) String status) {
-        Page<Visitor> page = visitorService.getPage(current, size, visitorName, buildingName, status);
+        Page<Visitor> page = visitorService.getPage(current, size, visitorName, visitorPhone, roomId, status);
         return Result.success(new PageResult<>(page));
     }
 

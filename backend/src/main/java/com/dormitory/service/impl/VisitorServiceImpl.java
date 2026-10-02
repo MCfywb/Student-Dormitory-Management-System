@@ -19,19 +19,22 @@ import java.util.*;
 public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, Visitor> implements VisitorService {
 
     @Override
-    public Page<Visitor> getPage(Integer current, Integer size, String visitorName, String buildingName, String status) {
+    public Page<Visitor> getPage(Integer current, Integer size, String visitorName, String visitorPhone, Long roomId, String status) {
         Page<Visitor> page = new Page<>(current, size);
         LambdaQueryWrapper<Visitor> wrapper = new LambdaQueryWrapper<>();
         if (visitorName != null && !visitorName.isEmpty()) {
             wrapper.like(Visitor::getVisitorName, visitorName);
         }
-        if (buildingName != null && !buildingName.isEmpty()) {
-            wrapper.eq(Visitor::getBuildingName, buildingName);
+        if (visitorPhone != null && !visitorPhone.isEmpty()) {
+            wrapper.like(Visitor::getVisitorPhone, visitorPhone);
+        }
+        if (roomId != null) {
+            wrapper.eq(Visitor::getRoomId, roomId);
         }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Visitor::getStatus, status);
         }
-        wrapper.orderByDesc(Visitor::getVisitTime);
+        wrapper.orderByDesc(Visitor::getId);
         return this.page(page, wrapper);
     }
 

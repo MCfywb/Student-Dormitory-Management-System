@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface VisitorService extends IService<Visitor> {
 
-    Page<Visitor> getPage(Integer current, Integer size, String visitorName, String buildingName, String status);
+    Page<Visitor> getPage(Integer current, Integer size, String visitorName, String visitorPhone, Long roomId, String status);
 
     void registerVisit(Visitor visitor);
 
