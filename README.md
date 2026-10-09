@@ -18,7 +18,7 @@
 |------|------|
 | Spring Boot | 4.1.1 |
 | JDK | 25 |
-| Maven | 3.9.16 |
+| Maven | 3.10.0 |
 | MyBatis-Plus | 3.5.17 |
 | MySQL | 26.7.0 |
 | JJWT | 0.13.0 |
@@ -29,10 +29,10 @@
 | 技术 | 版本 |
 |------|------|
 | Vue | 3.5.43 |
-| Vite | 8.3.2 |
+| Vite | 8.3.4 |
 | Element Plus | 2.14.7 |
 | Pinia | 4.0.3 |
-| Vue Router | 5.3.1 |
+| Vue Router | 5.4.0 |
 | Axios | 1.20.0 |
 | ECharts | 6.1.0 |
 
@@ -194,10 +194,10 @@ DormitoryManagementSystem
 ### 环境要求
 
 - JDK 25+
-- Maven 3.9.16
+- Maven 3.10.0
 - MySQL 26.7.0
-- Node.js 26+
-- npm / pnpm
+- Node.js 26
+- npm
 
 ### 1. 数据库初始化
 
