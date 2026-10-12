@@ -1,0 +1,430 @@
+学生宿舍管理系统
+系统说明书
+==== TABLE ====
+ROW0: 文件状态：[  ] 草稿[ √ ] 正式发布[  ] 正在修改 | 项目名称： | 学生宿舍管理系统
+ROW1:  | 文件标识： | Student-Dormitory-Management-System
+ROW2:  | 当前版本： | v 1.0.0
+ROW3:  | 姓    名： | 
+ROW4:  | 学    号： | 
+ROW5:  | 指导教师： | 
+ROW6:  | 完成日期： | 2026-10-06
+==== /TABLE ====
+
+
+[1] 一、引言
+[2] 1、编写目的
+本文档为「学生宿舍管理系统（Student Dormitory Management System，简称 SDMS）」的系统说明书，面向系统管理员、宿舍管理员、运维人员以及后续参与二次开发的开发人员，全面说明系统的建设目标、总体架构、功能设计、数据库设计、接口设计与部署运行方式。通过本文档，读者能够了解系统各模块的业务职责与操作流程，掌握数据库表结构与接口约定，并能够独立完成系统的部署、启动与日常维护工作。
+[2] 2、项目背景
+高校学生宿舍管理工作涉及楼栋与房间资源、学生住宿分配、卫生检查、设施设备与维修、住宿费用收缴、公告通知与来访登记等大量日常事务。传统以纸质登记与电子表格为主的管理方式存在数据分散、更新滞后、统计困难、责任难以追溯等问题。为此，本系统以信息化手段对上述业务进行整合，构建覆盖宿舍资源分配与日常运营全流程的数字化管理平台，为管理员、宿管与学生提供统一的协作入口，提升管理效率与数据透明度。
+[2] 3、参考资料
+《项目开发综合实战》实训任务书与实训报告模板
+Spring Boot 官方参考文档
+MyBatis-Plus 官方参考文档
+Vue 3 官方参考文档
+Element Plus 组件库文档
+Apache ECharts 官方文档
+[1] 二、系统概述
+[2] 1、系统简介
+本系统名为「宿舍事务管理系统」，英文名称为 Student Dormitory Management System（SDMS），是一套面向高校学生宿舍场景的前后端分离综合管理平台。系统以 Spring Boot 与 Vue 3 为主要技术路线，后端对外提供统一的 RESTful 接口，前端提供管理员门户、宿管门户与学生门户三套界面，覆盖从宿舍资源分配到日常运营的完整业务闭环，实现住宿分配、卫生检查、设施维修、费用收缴、公告发布与来访登记等业务的在线化处理。
+[2] 2、用户角色与权限
+系统用户分为管理员、宿管、学生三类角色，各角色的职责与可用功能如下表所示。
+==== TABLE ====
+ROW0: 角色 | 角色标识 | 主要职责 | 主要功能模块
+ROW1: 管理员 | admin | 系统全功能访问，负责基础数据与业务数据维护，可管理宿管账号 | 首页看板、宿舍楼管理、房间管理、宿管管理、学生管理、住宿管理、卫生管理、设施管理、维修管理、费用管理、公告管理、来访登记、个人中心
+ROW2: 宿管 | manager | 所辖楼栋的日常管理，包括住宿分配、卫生检查、维修处理、来访登记 | 首页看板、宿舍楼管理、房间管理、学生管理、住宿管理、卫生管理、设施管理、维修管理、费用管理、公告管理、来访登记、个人中心
+ROW3: 学生 | student | 以自助服务为主，查看个人住宿信息与业务办理进度 | 学生首页、我的宿舍、卫生检查、报修申请、费用查询、公告通知、个人中心
+==== /TABLE ====
+权限控制在前端通过路由守卫与菜单可见性双重实现：路由配置中为每个页面声明 meta.roles，路由前置守卫在跳转前读取本地缓存的用户角色进行校验，越权访问会被重定向至该角色对应的门户首页；侧边栏菜单中的「宿管管理」菜单项仅对管理员角色渲染。学生端所有数据查询均以当前登录学生的档案编号与房间编号作为过滤条件，保证学生只能查看与自身相关的数据。
+[2] 3、运行环境
+==== TABLE ====
+ROW0: 环境项 | 要求
+ROW1: 操作系统 | Windows 10 / 11（开发与运行验证环境）
+ROW2: 运行环境 | JDK 25 及以上
+ROW3: 构建工具 | Apache Maven 3.10.0
+ROW4: 数据库 | MySQL 26.0 及以上，字符集 utf8mb3
+ROW5: 前端运行时 | Node.js 26 及以上，npm
+ROW6: 浏览器 | Chrome、Edge 等现代浏览器
+ROW7: 后端服务 | 端口 8080，上下文路径 /api
+ROW8: 前端服务 | 端口 5173（Vite 开发服务器）
+==== /TABLE ====
+[1] 三、系统总体设计
+[2] 1、总体架构
+系统采用前后端分离的 B/S 架构，自下而上划分为数据层、持久层、业务服务层、接口层与表现层五个层次。
+数据层：采用 MySQL 关系型数据库，共 11 张业务表，统一采用逻辑删除策略，通过冗余字段维护业务关联。
+持久层：以 MyBatis-Plus 作为 ORM 框架，Mapper 接口继承 BaseMapper 获得通用增删改查能力，配合分页插件实现物理分页，并通过元数据处理器自动填充创建时间与更新时间。
+业务服务层：Service 接口继承 IService，ServiceImpl 完成业务校验、事务控制、状态流转与统计聚合等核心逻辑。
+接口层：由 Spring MVC 控制器对外暴露 RESTful 接口，统一封装为 Result 响应对象，并由全局异常处理器统一转换异常信息。
+表现层：基于 Vue 3 的单页应用，使用 Element Plus 组件库构建界面，Axios 统一发起请求，ECharts 渲染数据看板图表。
+前后端通过 HTTP 与 JSON 进行数据交互。前端开发服务器将 /api 前缀的请求代理转发至后端 8080 端口，后端通过 WebMvcConfigurer 配置跨域访问规则与上传文件静态资源映射。
+[2] 2、技术选型
+后端技术选型如下表所示。
+==== TABLE ====
+ROW0: 技术 | 版本 | 用途
+ROW1: Spring Boot | 4.1.1 | 应用基础框架与内嵌 Web 容器
+ROW2: JDK | 25 | Java 开发与运行环境
+ROW3: MyBatis-Plus | 3.5.17 | ORM 框架、分页插件与逻辑删除
+ROW4: MySQL Connector/J | 26.7.0 | 数据库驱动
+ROW5: Lombok | 1.18.48 | 简化实体类代码
+ROW6: Hutool | 5.8.47 | Java 工具类库
+ROW7: FastJSON2 | 2.0.65 | JSON 序列化与解析
+ROW8: Jakarta Bean Validation | 随 Spring Boot | 接口入参校验
+ROW9: Maven | 3.10.0 | 项目构建与依赖管理
+==== /TABLE ====
+前端技术选型如下表所示。
+==== TABLE ====
+ROW0: 技术 | 版本 | 用途
+ROW1: Vue | 3.5.43 | 前端核心框架
+ROW2: Vue Router | 5.4.0 | 前端路由与访问权限守卫
+ROW3: Pinia | 4.0.3 | 全局状态管理
+ROW4: Element Plus | 2.14.7 | UI 组件库
+ROW5: Axios | 1.20.0 | HTTP 请求客户端
+ROW6: ECharts | 6.1.0 | 数据可视化图表
+ROW7: Vite | 8.3.4 | 前端构建与开发服务器
+==== /TABLE ====
+[2] 3、功能模块划分
+系统按业务域划分为十三个功能模块，各模块的主要业务对象与核心能力如下表所示。
+==== TABLE ====
+ROW0: 序号 | 功能模块 | 主要业务对象 | 核心能力
+ROW1: 1 | 认证与账号管理 | 系统用户、学生档案 | 登录、注册、密码修改与重置、用户信息查询
+ROW2: 2 | 首页数据看板 | 全局统计指标 | 核心指标卡片、多维统计图表、最近检查记录
+ROW3: 3 | 宿舍楼管理 | 宿舍楼 | 楼栋增删改查、条件检索、楼栋住宿统计
+ROW4: 4 | 宿舍房间管理 | 宿舍房间 | 房间增删改查、入住率展示、床位可视化、分层统计
+ROW5: 5 | 宿管管理 | 宿管账号 | 宿管账号增删改查、启用与禁用
+ROW6: 6 | 学生管理 | 学生档案 | 学生档案增删改查、多条件检索、详情查看
+ROW7: 7 | 住宿管理 | 住宿分配记录 | 入住分配、床位校验、退宿办理
+ROW8: 8 | 卫生管理 | 卫生检查记录 | 检查登记、自动评级、等级统计、楼栋平均分
+ROW9: 9 | 设施管理 | 设施设备 | 设施台账维护、状态跟踪、分类统计
+ROW10: 10 | 维修管理 | 维修工单 | 报修提交、工单处理、费用登记、状态统计
+ROW11: 11 | 费用管理 | 费用类型、费用记录 | 费用生成、在线缴费、收缴统计、趋势分析
+ROW12: 12 | 公告管理 | 公告通知 | 公告发布、草稿与发布状态、浏览量统计
+ROW13: 13 | 来访登记 | 来访记录 | 来访登记、离开标记、访问统计与趋势
+==== /TABLE ====
+[1] 四、功能模块详细说明
+[2] 1、登录认证与账号管理
+认证模块由 AuthController 提供支撑，包含登录、注册、修改密码、重置密码与用户信息查询五类接口。登录时系统按用户名与密码匹配系统用户表，账号状态为禁用时拒绝登录并给出明确提示；登录成功后，若用户角色为学生，响应中额外附带该学生的档案信息，前端将其缓存至本地，供学生端各页面取用。学生注册时系统校验用户名与学号的唯一性，在同一事务中创建系统用户账号与学生档案，档案初始状态为待入住，账号默认角色为学生。修改密码需校验原密码正确性；忘记密码时通过用户名、学号与注册手机号三重校验后重置。个人中心支持查看与修改姓名、性别、手机号、邮箱等基本信息，并支持上传头像，头像文件按日期分目录存储并以 UUID 重命名，上传成功后回写用户表的头像字段。
+[2] 2、首页数据看板
+管理端首页看板由 DashboardController 提供数据支撑。总览接口一次性聚合房间总数、床位总数、已用床位、可用床位、学生总数、应收费用、已收费用、未缴笔数、待处理报修数与今日来访数等核心指标，前端以统计卡片形式呈现。看板同时提供六类统计图表：各楼栋入住率对比、学生学院分布、卫生检查等级分布、设施状态分布、房间状态分布与费用收缴情况，分别以柱状图与饼图渲染，并支持随浅色与深色主题自动重绘配色。页面底部展示最近若干条卫生检查记录。学生端首页则为欢迎卡片、住宿信息卡片、最新公告列表、快捷入口与未缴费用提醒，便于学生快速掌握待办事项。
+[2] 3、宿舍楼管理
+宿舍楼模块维护楼栋基础信息，包括楼栋名称、楼栋类型、楼层数、每层房间数、负责宿管与备注说明。模块支持楼栋的增删改查，删除采用逻辑删除，历史数据不会被物理清除。检索支持按楼栋名称模糊匹配、按楼栋类型与负责宿管精确筛选。新增或编辑楼栋时选择宿管后，系统自动回填宿管姓名，避免冗余字段手工填写出现不一致。模块还提供楼栋住宿统计接口，逐栋统计床位总数、已用床位与可用床位，为床位资源调度提供数据依据；楼栋详情接口则返回楼栋信息及其下属房间清单。
+[2] 4、宿舍房间管理
+房间模块以房间为核心对象，维护房间号、所属楼栋、所在楼层、床位容量、房间类型、状态与住宿费用等属性。数据库层以房间号与楼栋编号建立唯一约束，防止同一楼栋出现重复房间号。列表页支持按房间号、楼栋、房间类型与状态组合筛选，并以进度条直观展示每间房的入住率。房间的已入住人数在查询时依据在住学生数量实时重算，避免因增减住宿记录而产生脏数据。房间详情弹窗展示房间基本信息、当前入住学生名单与床位占用网格，管理人员可直接在床位网格中辨识可用床位，也可对在住学生办理退宿。模块另提供房间状态统计与按楼层统计两个接口，辅助管理人员掌握整栋楼的空置与维修情况。
+[2] 5、宿管管理
+宿管模块仅对管理员角色开放，用于维护宿管账号的增删改查并控制账号的启用与禁用状态。新增宿管时可设置初始密码，系统固定写入宿管角色；编辑时用户名不可修改且不展示密码项，避免误改登录凭据。列表支持按用户名、姓名、性别与账号状态组合检索。宿管账号被禁用后不可用于登录，但其负责楼栋的历史管理记录仍完整保留。
+[2] 6、学生管理
+学生模块维护学生档案，字段涵盖学号、姓名、性别、手机号、邮箱、学院、专业、班级、年级、身份证号以及住宿相关的楼栋、房间与床位信息。新增学生时后端自动同步创建登录账号，用户名取学号、初始密码统一设定，无需管理员另行开户；修改档案时同步更新登录账号中的姓名、性别、手机号与邮箱，保证两处数据一致；删除档案时级联移除对应的登录账号。列表支持按学号、姓名、性别、学院与年级组合检索，查看详情时同时返回档案信息与账号信息。模块另提供学院分布与年级分布两项统计接口，为数据看板提供学生结构数据，并可按房间查询室友名单。
+[2] 7、住宿管理
+住宿管理模块处理入住分配与退宿两项核心业务。分配住宿时，管理人员依次选择楼栋、房间与床位，系统对房间是否存在、是否已满员、是否处于维修状态以及目标床位是否已被占用进行逐项校验，任一条件不满足即拒绝分配并给出原因；校验通过后写入学生的楼栋、房间、床位与入住时间，档案状态置为已入住，同时递增房间已入住人数，人数达到容量上限时房间状态自动转为已满。办理退宿时系统清空学生的住宿字段并将档案状态置为已退宿，同时回退房间人数与状态。列表支持按学号、姓名、性别、楼栋房间与住宿状态组合查询，并支持查看学生详情。
+[2] 8、卫生管理
+卫生模块记录每次宿舍卫生检查的结果，包含检查房间、检查日期、评分、等级、检查人与备注。评分采用零至一百分制，提交时系统自动换算等级：九十分及以上为优秀，八十分及以上为良好，六十分及以上为合格，其余为不合格，修改评分时同样重新计算等级，避免人工填写出现等级与分数不符。检查人信息由系统根据当前登录用户自动填充。模块支持按房间号、楼栋、等级与检查人组合检索，并提供等级分布统计、各楼栋平均分统计与最近检查记录查询。学生端可查看本宿舍的历史检查记录，包含每次检查的日期、分数、等级、检查人与备注说明。
+[2] 9、设施管理
+设施模块建立宿舍设施设备台账，记录设施名称、设施类型、所属房间、购买日期、单价、状态与备注，类型涵盖家具、电器与其他三类。模块支持设施的增删改查，支持按名称、类型、房间与状态组合筛选，并提供设施状态统计与类型分布统计，其中状态统计同时汇总设施总价值，为资产盘点提供依据。学生端的「我的宿舍」页面会列出本房间配置的设施清单，学生发起报修时可直接从本房间设施列表中选择报修对象。
+[2] 10、维修管理
+维修模块以工单形式贯穿报修全流程。学生提交报修时选择本房间设施并填写问题现象，系统自动记录报修人与报修时间，工单状态置为待处理，同时将该设施状态标记为损坏。管理人员在处理工单时可将状态推进为处理中或已完成，已完成时可登记处理结果与实际维修费用；工单完成后设施状态自动恢复为正常，若维修费用大于零，系统自动生成一条维修费费用记录并关联至报修学生，缴费账期按报修时间顺延七天计算，学年与学期由系统依据当前月份自动判定。模块支持按设施名称、房间、报修人、状态与处理人组合检索，提供待处理、处理中、已完成三类状态的数量统计，学生端则可查看自己提交的全部报修工单及处理进度。
+[2] 11、费用管理
+费用模块由费用类型与费用记录两部分构成。费用类型定义收费项目，包含类型名称、类型编码、单价、计量单位、说明与启用状态；费用记录则关联学生、费用类型、金额、缴费状态、缴费方式、缴费时间、学年、学期与应缴日期。管理人员可为指定学生手工新增费用记录，也可由维修业务自动派生。缴费支持现金、微信、支付宝与银行卡四种方式，缴费时系统校验记录是否已缴，已缴记录不允许重复缴费并抛出业务异常。列表支持按学号、姓名、费用类型、学年、学期与缴费状态组合检索，提供收缴情况统计与近十二个月的月度收缴趋势。学生端以待缴费与已缴费两个标签页分类展示个人账单，待缴费记录可在线完成缴费操作。
+[2] 12、公告管理
+公告模块支持通知、公告与警告三类信息的发布与管理，字段包含标题、正文、类型、发布人、发布时间、状态与浏览量。公告支持草稿与已发布两种状态，仅已发布的公告对学生可见；查看公告详情时浏览量自动累加。模块提供按标题、类型、发布人与状态的组合检索，并提供公告类型分布统计。学生端首页与公告页展示最新公告列表，点击即可查看正文详情。
+[2] 13、来访登记与系统特性
+来访登记模块记录校外人员进出宿舍的情况，包含来访人姓名、联系电话、身份证号、来访事由、访问楼栋与房间、被访学生、到访时间与离开时间。登记时状态置为访问中，离开时登记离开时间并将状态置为已离开。模块支持按来访人姓名、联系电话、访问房间与状态组合检索，并提供访问统计，包含总访问量、在访人数、已离开人数、各楼栋访问分布以及近七天访问趋势。
+系统层面还提供若干通用特性：界面支持浅色、深色与跟随系统三种主题，切换后图表配色同步重绘；管理端侧边栏可折叠，并配有面包屑导航；所有列表查询统一采用分页参数与统一响应结构；数据删除一律采用逻辑删除，配合自动填充的时间字段，保证业务数据可追溯。
+[1] 五、数据库设计
+[2] 1、数据库概述
+数据库名称为 dormitory_db，字符集为 utf8mb4，排序规则为 utf8mb4_unicode_ci，存储引擎为 InnoDB，共包含 11 张业务表。所有业务表均包含 create_time、update_time 与 deleted 三个公共字段，其中 deleted 为逻辑删除标记，取值 0 表示未删除、1 表示已删除，由 MyBatis-Plus 全局配置统一维护，查询时自动追加过滤条件。各业务表之间不设置物理外键约束，关联关系通过冗余编号与名称字段在应用层维护，以提升查询效率并降低级联操作风险。
+[2] 2、数据表清单
+==== TABLE ====
+ROW0: 序号 | 表名 | 中文名称 | 主要用途
+ROW1: 1 | sys_user | 系统用户表 | 存储管理员、宿管与学生的登录账号与角色
+ROW2: 2 | building | 宿舍楼表 | 存储宿舍楼基础信息与负责宿管
+ROW3: 3 | room | 宿舍房间表 | 存储房间信息、床位容量与住宿费用
+ROW4: 4 | student_info | 学生信息表 | 存储学生学籍档案与住宿信息
+ROW5: 5 | hygiene | 卫生检查表 | 存储宿舍卫生检查记录与评级结果
+ROW6: 6 | facility | 设施表 | 存储宿舍设施设备台账
+ROW7: 7 | facility_repair | 设施维修表 | 存储设施报修与处理工单
+ROW8: 8 | fee_type | 费用类型表 | 定义住宿费、水电费等收费项目
+ROW9: 9 | fee_record | 费用记录表 | 存储学生应缴费用与缴费状态
+ROW10: 10 | notice | 公告通知表 | 存储公告内容与浏览量
+ROW11: 11 | visitor | 来访登记表 | 存储来访人员登记与进出记录
+==== /TABLE ====
+[2] 3、主要表结构说明
+[3] （1）系统用户表 sys_user
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 用户编号
+ROW2: username | VARCHAR(50) | 非空，唯一 | 登录用户名
+ROW3: password | VARCHAR(100) | 非空 | 登录密码
+ROW4: real_name | VARCHAR(50) | 非空 | 真实姓名
+ROW5: gender | VARCHAR(10) | 默认 男 | 性别
+ROW6: phone | VARCHAR(20) |  | 联系电话
+ROW7: email | VARCHAR(50) |  | 电子邮箱
+ROW8: avatar | VARCHAR(255) |  | 头像地址
+ROW9: role | VARCHAR(20) | 非空，默认 student | 角色：admin / manager / student
+ROW10: status | TINYINT | 默认 1 | 状态：0 禁用，1 启用
+ROW11: create_time | DATETIME | 默认当前时间 | 创建时间
+ROW12: update_time | DATETIME | 自动更新 | 更新时间
+ROW13: deleted | TINYINT | 默认 0 | 逻辑删除标记
+==== /TABLE ====
+[3] （2）宿舍楼表 building
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 楼栋编号
+ROW2: building_name | VARCHAR(50) | 非空 | 楼栋名称
+ROW3: building_type | VARCHAR(20) | 非空 | 楼栋类型：male / female
+ROW4: floors | INT | 非空，默认 6 | 楼层数
+ROW5: rooms_per_floor | INT | 非空，默认 20 | 每层房间数
+ROW6: manager_id | BIGINT |  | 负责宿管编号
+ROW7: manager_name | VARCHAR(50) |  | 负责宿管姓名
+ROW8: description | VARCHAR(255) |  | 楼栋说明
+==== /TABLE ====
+[3] （3）宿舍房间表 room
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 房间编号
+ROW2: room_number | VARCHAR(20) | 非空 | 房间号
+ROW3: building_id | BIGINT | 非空 | 所属楼栋编号
+ROW4: building_name | VARCHAR(50) |  | 所属楼栋名称
+ROW5: floor | INT | 非空 | 所在楼层
+ROW6: capacity | INT | 非空，默认 4 | 床位容量
+ROW7: current_count | INT | 默认 0 | 已入住人数
+ROW8: room_type | VARCHAR(20) | 默认 standard | 房间类型：standard / superior
+ROW9: status | VARCHAR(20) | 默认 available | 状态：available / full / maintenance
+ROW10: price | DECIMAL(10,2) | 默认 1200.00 | 住宿费用
+==== /TABLE ====
+说明：room_number 与 building_id 组合构成唯一约束，保证同一楼栋内房间号不重复。
+[3] （4）学生信息表 student_info
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 档案编号
+ROW2: user_id | BIGINT | 非空 | 关联登录账号编号
+ROW3: student_no | VARCHAR(20) | 非空，唯一 | 学号
+ROW4: real_name | VARCHAR(50) | 非空 | 姓名
+ROW5: gender | VARCHAR(10) | 默认 男 | 性别
+ROW6: phone | VARCHAR(20) |  | 联系电话
+ROW7: email | VARCHAR(50) |  | 电子邮箱
+ROW8: college | VARCHAR(100) |  | 所属学院
+ROW9: major | VARCHAR(100) |  | 所学专业
+ROW10: class_name | VARCHAR(50) |  | 所在班级
+ROW11: grade | VARCHAR(20) |  | 年级
+ROW12: id_card | VARCHAR(20) |  | 身份证号
+ROW13: room_id | BIGINT |  | 住宿房间编号
+ROW14: room_number | VARCHAR(20) |  | 住宿房间号
+ROW15: building_id | BIGINT |  | 住宿楼栋编号
+ROW16: building_name | VARCHAR(50) |  | 住宿楼栋名称
+ROW17: bed_number | INT |  | 床位号
+ROW18: check_in_time | DATETIME |  | 入住时间
+ROW19: status | VARCHAR(20) | 默认 checked_in | 状态：pending / checked_in / checked_out
+==== /TABLE ====
+[3] （5）卫生检查表 hygiene
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 记录编号
+ROW2: room_id | BIGINT | 非空 | 检查房间编号
+ROW3: room_number | VARCHAR(20) | 非空 | 检查房间号
+ROW4: building_id | BIGINT | 非空 | 所属楼栋编号
+ROW5: building_name | VARCHAR(50) | 非空 | 所属楼栋名称
+ROW6: check_date | DATE | 非空 | 检查日期
+ROW7: score | INT | 非空 | 评分，取值 0 至 100
+ROW8: level | VARCHAR(20) |  | 等级：excellent / good / qualified / unqualified
+ROW9: checker_id | BIGINT |  | 检查人编号
+ROW10: checker_name | VARCHAR(50) |  | 检查人姓名
+ROW11: remark | VARCHAR(500) |  | 检查备注
+==== /TABLE ====
+[3] （6）设施表 facility
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 设施编号
+ROW2: facility_name | VARCHAR(50) | 非空 | 设施名称
+ROW3: facility_type | VARCHAR(30) | 非空 | 类型：furniture / appliance / other
+ROW4: room_id | BIGINT |  | 所属房间编号
+ROW5: room_number | VARCHAR(20) |  | 所属房间号
+ROW6: building_id | BIGINT |  | 所属楼栋编号
+ROW7: building_name | VARCHAR(50) |  | 所属楼栋名称
+ROW8: purchase_date | DATE |  | 购置日期
+ROW9: price | DECIMAL(10,2) |  | 单价
+ROW10: status | VARCHAR(20) | 默认 normal | 状态：normal / damaged / repairing / scrapped
+ROW11: remark | VARCHAR(255) |  | 备注
+==== /TABLE ====
+[3] （7）设施维修表 facility_repair
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 工单编号
+ROW2: facility_id | BIGINT | 非空 | 报修设施编号
+ROW3: facility_name | VARCHAR(50) |  | 报修设施名称
+ROW4: room_id | BIGINT |  | 所属房间编号
+ROW5: room_number | VARCHAR(20) |  | 所属房间号
+ROW6: building_name | VARCHAR(50) |  | 所属楼栋名称
+ROW7: reporter_id | BIGINT |  | 报修人编号
+ROW8: reporter_name | VARCHAR(50) |  | 报修人姓名
+ROW9: report_time | DATETIME | 默认当前时间 | 报修时间
+ROW10: problem_desc | VARCHAR(500) |  | 问题描述
+ROW11: status | VARCHAR(20) | 默认 pending | 状态：pending / processing / completed
+ROW12: handler_id | BIGINT |  | 处理人编号
+ROW13: handler_name | VARCHAR(50) |  | 处理人姓名
+ROW14: handle_time | DATETIME |  | 处理时间
+ROW15: handle_result | VARCHAR(500) |  | 处理结果
+ROW16: repair_cost | DECIMAL(10,2) |  | 维修费用
+==== /TABLE ====
+[3] （8）费用类型表 fee_type
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 类型编号
+ROW2: type_name | VARCHAR(50) | 非空 | 类型名称
+ROW3: type_code | VARCHAR(30) | 非空，唯一 | 类型编码
+ROW4: price | DECIMAL(10,2) | 非空 | 单价
+ROW5: unit | VARCHAR(20) |  | 计量单位
+ROW6: description | VARCHAR(255) |  | 类型说明
+ROW7: status | TINYINT | 默认 1 | 启用状态
+==== /TABLE ====
+[3] （9）费用记录表 fee_record
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 记录编号
+ROW2: student_id | BIGINT | 非空 | 学生档案编号
+ROW3: student_no | VARCHAR(20) |  | 学号
+ROW4: student_name | VARCHAR(50) |  | 学生姓名
+ROW5: fee_type_id | BIGINT | 非空 | 费用类型编号
+ROW6: fee_type_name | VARCHAR(50) |  | 费用类型名称
+ROW7: amount | DECIMAL(10,2) | 非空 | 应收金额
+ROW8: pay_status | VARCHAR(20) | 默认 unpaid | 状态：unpaid / paid / overdue
+ROW9: pay_time | DATETIME |  | 缴费时间
+ROW10: pay_method | VARCHAR(20) |  | 缴费方式：cash / wechat / alipay / card
+ROW11: academic_year | VARCHAR(20) |  | 学年
+ROW12: semester | VARCHAR(20) |  | 学期
+ROW13: due_date | DATE |  | 应缴日期
+ROW14: remark | VARCHAR(255) |  | 备注
+==== /TABLE ====
+[3] （10）公告通知表 notice
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 公告编号
+ROW2: title | VARCHAR(100) | 非空 | 公告标题
+ROW3: content | TEXT |  | 公告正文
+ROW4: notice_type | VARCHAR(20) | 默认 notice | 类型：notice / announcement / warning
+ROW5: publisher_id | BIGINT |  | 发布人编号
+ROW6: publisher_name | VARCHAR(50) |  | 发布人姓名
+ROW7: publish_time | DATETIME | 默认当前时间 | 发布时间
+ROW8: status | TINYINT | 默认 1 | 状态：0 草稿，1 已发布
+ROW9: view_count | INT | 默认 0 | 浏览量
+==== /TABLE ====
+[3] （11）来访登记表 visitor
+==== TABLE ====
+ROW0: 字段名 | 类型 | 约束 | 说明
+ROW1: id | BIGINT | 主键，自增 | 记录编号
+ROW2: visitor_name | VARCHAR(50) | 非空 | 来访人姓名
+ROW3: visitor_phone | VARCHAR(20) |  | 联系电话
+ROW4: visitor_id_card | VARCHAR(20) |  | 身份证号
+ROW5: visit_reason | VARCHAR(255) |  | 来访事由
+ROW6: building_id | BIGINT |  | 访问楼栋编号
+ROW7: building_name | VARCHAR(50) |  | 访问楼栋名称
+ROW8: room_id | BIGINT |  | 访问房间编号
+ROW9: room_number | VARCHAR(20) |  | 访问房间号
+ROW10: visited_student_id | BIGINT |  | 被访学生编号
+ROW11: visited_student_name | VARCHAR(50) |  | 被访学生姓名
+ROW12: visit_time | DATETIME | 默认当前时间 | 到访时间
+ROW13: leave_time | DATETIME |  | 离开时间
+ROW14: status | VARCHAR(20) | 默认 visiting | 状态：visiting / left
+ROW15: register_id | BIGINT |  | 登记人编号
+ROW16: register_name | VARCHAR(50) |  | 登记人姓名
+ROW17: remark | VARCHAR(255) |  | 备注
+==== /TABLE ====
+[2] 4、表间关系
+各表之间的逻辑关联关系如下，关联通过应用层冗余编号与名称字段维护。
+系统用户与学籍档案：sys_user.id 与 student_info.user_id 一一对应，一个登录账号对应一份学生档案。
+宿舍楼与房间：building.id 与 room.building_id 一对多，楼栋信息同时冗余至房间表的楼栋名称字段。
+房间与学生：room.id 与 student_info.room_id 一对多，学生的房间号、楼栋编号与楼栋名称同步冗余，便于按楼栋维度统计。
+宿舍楼与宿管：building.manager_id 指向 sys_user.id 中角色为宿管的用户。
+房间与卫生检查：room.id 与 hygiene.room_id 一对多，记录该房间的历次检查结果。
+房间与设施：room.id 与 facility.room_id 一对多；设施与维修工单通过 facility.id 与 facility_repair.facility_id 关联。
+学生与费用：student_info.id 与 fee_record.student_id 一对多；费用类型通过 fee_type.id 与 fee_record.fee_type_id 关联。
+学生与来访：student_info.id 与 visitor.visited_student_id 一对多，记录被访学生信息。
+用户与业务操作：sys_user.id 分别关联卫生检查的检查人、维修工单的报修人与处理人、公告的发布人以及来访记录的登记人。
+为提升检索效率，数据库在角色、状态、楼栋、房间、日期等高频查询字段上建立了十五个普通索引。
+[1] 六、接口设计
+[2] 1、接口规范
+系统接口遵循以下统一约定。
+访问地址：后端服务根路径为 http://localhost:8080/api，所有接口均位于该路径之下。
+数据格式：请求与响应均采用 JSON，日期时间格式为 yyyy-MM-dd HH:mm:ss，时区为 GMT+8。
+统一响应：所有接口返回统一的 Result 结构，包含 code、message 与 data 三个字段，code 取值为 200 表示处理成功，非 200 表示业务失败，message 携带中文提示信息。
+分页约定：分页查询统一接收 current 与 size 参数，分别表示当前页码与每页条数，响应封装为 PageResult，包含 records、total、size、current 与 pages 五个字段。
+异常处理：由全局异常处理器统一捕获运行时异常与系统异常，业务异常直接返回其提示信息，未知异常统一返回系统异常提示，避免堆栈信息外泄。
+跨域与上传：后端开放跨域访问并映射上传目录，单个文件大小上限为 10MB。
+[2] 2、接口清单
+按业务域划分的主要接口如下表所示，所有路径均需拼接 /api 前缀。
+==== TABLE ====
+ROW0: 业务域 | 方法 | 路径 | 说明
+ROW1: 认证 | POST | /auth/login | 用户登录
+ROW2: 认证 | POST | /auth/register | 学生注册
+ROW3: 认证 | POST | /auth/updatePassword | 修改密码
+ROW4: 认证 | POST | /auth/resetPassword | 重置密码
+ROW5: 认证 | GET | /auth/info/{userId} | 查询用户信息
+ROW6: 宿管 | GET | /manager/page | 宿管分页查询
+ROW7: 宿管 | POST | /manager | 新增宿管
+ROW8: 宿管 | PUT | /manager | 修改宿管
+ROW9: 宿管 | DELETE | /manager/{id} | 删除宿管
+ROW10: 宿舍楼 | GET | /building/page | 楼栋分页查询
+ROW11: 宿舍楼 | GET | /building/list | 楼栋列表
+ROW12: 宿舍楼 | GET | /building/stats | 楼栋住宿统计
+ROW13: 宿舍楼 | POST / PUT | /building | 新增与修改楼栋
+ROW14: 宿舍楼 | DELETE | /building/{id} | 删除楼栋
+ROW15: 房间 | GET | /room/page | 房间分页查询
+ROW16: 房间 | GET | /room/available | 可入住房间
+ROW17: 房间 | GET | /room/stats | 房间状态统计
+ROW18: 房间 | POST | /room/assign | 分配住宿
+ROW19: 房间 | POST | /room/leave/{studentId} | 办理退宿
+ROW20: 房间 | POST / PUT | /room | 新增与修改房间
+ROW21: 房间 | DELETE | /room/{id} | 删除房间
+ROW22: 学生 | GET | /student/page | 学生分页查询
+ROW23: 学生 | POST | /student | 新增学生
+ROW24: 学生 | PUT | /student | 修改学生
+ROW25: 学生 | DELETE | /student/{id} | 删除学生
+ROW26: 学生 | GET | /student/collegeStats | 学院分布统计
+ROW27: 卫生 | GET | /hygiene/page | 检查记录分页查询
+ROW28: 卫生 | POST / PUT | /hygiene | 新增与修改检查记录
+ROW29: 卫生 | GET | /hygiene/stats | 等级分布统计
+ROW30: 设施 | GET | /facility/page | 设施分页查询
+ROW31: 设施 | POST / PUT | /facility | 新增与修改设施
+ROW32: 设施 | DELETE | /facility/{id} | 删除设施
+ROW33: 维修 | GET | /repair/page | 工单分页查询
+ROW34: 维修 | POST | /repair | 提交报修
+ROW35: 维修 | PUT | /repair/handle | 处理工单
+ROW36: 维修 | GET | /repair/my/{userId} | 我的报修
+ROW37: 费用 | GET | /fee/page | 费用分页查询
+ROW38: 费用 | POST | /fee | 新增费用记录
+ROW39: 费用 | POST | /fee/pay | 办理缴费
+ROW40: 费用 | GET | /fee/stats | 收缴统计
+ROW41: 费用 | GET | /fee/trend | 收缴趋势
+ROW42: 费用类型 | GET | /feeType/list | 启用中的费用类型
+ROW43: 公告 | GET | /notice/page | 公告分页查询
+ROW44: 公告 | POST / PUT | /notice | 发布与修改公告
+ROW45: 公告 | GET | /notice/{id} | 公告详情，浏览量累加
+ROW46: 来访 | GET | /visitor/page | 来访分页查询
+ROW47: 来访 | POST | /visitor | 登记来访
+ROW48: 来访 | POST | /visitor/leave/{id} | 标记离开
+ROW49: 看板 | GET | /dashboard/overview | 总览指标
+ROW50: 看板 | GET | /dashboard/buildingStats | 楼栋入住统计
+ROW51: 看板 | GET | /dashboard/feeTrend | 费用收缴趋势
+ROW52: 上传 | POST | /upload/avatar | 上传头像
+==== /TABLE ====
+[1] 七、系统部署与运行
+[2] 1、部署前准备
+部署前需准备以下环境：安装 JDK 25 及以上版本并配置 JAVA_HOME 环境变量；安装 Apache Maven 3.10.0 并配置镜像仓库；安装 MySQL 26.0 及以上版本并启动数据库服务；安装 Node.js 26 及以上版本，确保 npm 可用。
+[2] 2、数据库初始化
+使用数据库脚本初始化库表结构与演示数据，执行方式如下：以 root 用户登录 MySQL，执行项目后端资源目录下的 dormitory_db.sql 脚本，脚本将自动创建 dormitory_db 数据库、11 张业务表、相关索引，并写入管理员、宿管与学生等演示数据。
+[2] 3、后端配置与启动
+打开后端资源目录下的 application.yml 配置文件，将数据库连接地址、用户名与密码修改为本地实际配置，同时按需调整文件上传目录。配置完成后，可在集成开发环境中直接运行启动类 DormitoryApplication，也可在项目后端目录下执行 Maven 的 spring-boot:run 命令启动服务。启动成功后后端服务监听 8080 端口，接口根路径为 /api。
+[2] 4、前端启动
+进入前端目录执行依赖安装命令，安装完成后执行开发启动命令，前端开发服务器默认监听 5173 端口，并将 /api 前缀的请求代理转发至后端服务。浏览器访问 5173 端口即可进入登录页面。如需生成生产环境静态资源，可执行构建命令，产物输出至前端 dist 目录。
+[2] 5、默认账号
+系统初始化脚本内置以下演示账号，初始密码统一为 123456。
+==== TABLE ====
+ROW0: 角色 | 用户名 | 密码 | 说明
+ROW1: 管理员 | admin | 123456 | 系统管理员
+ROW2: 宿管 | manager1 | 123456 | 张宿管
+ROW3: 宿管 | manager2 | 123456 | 李宿管
+ROW4: 宿管 | manager3 | 123456 | 王宿管
+ROW5: 学生 | 2024001001 | 123456 | 张三，其余学生账号为对应学号
+==== /TABLE ====
+[2] 6、注意事项
+启动顺序上应先启动数据库，再启动后端服务，最后启动前端服务；若修改了数据库密码，需同步更新后端配置文件，否则后端启动时会因数据库连接失败而退出。前端代理目标端口应与后端实际监听端口保持一致。上传目录需保证应用具备写权限，否则头像上传与文件上传会失败。若前端端口被占用，可在 Vite 配置中调整端口或关闭占用程序。
+[1] 八、总结
+本系统围绕高校学生宿舍管理场景，完成了从数据库建模、后端接口设计到前端界面实现的完整开发流程，形成了一套包含十三个功能模块、十一个控制器、十一张业务表的前后端分离应用。系统通过角色划分实现了管理员、宿管与学生三类用户的差异化功能门户，通过统一的响应结构、分页约定与全局异常处理保证了接口的一致性与健壮性，通过逻辑删除与时间字段自动填充保证了业务数据的可追溯性，通过实时重算房间入住人数、自动换算卫生等级、自动生成维修费用等规则设计减少了人工维护成本。
+同时，系统在以下方面仍有改进空间：认证目前基于用户名与密码明文比对，尚未引入令牌机制与后端接口级权限校验，权限控制主要依赖前端路由守卫；数据查询未引入缓存，统计类接口在数据量增长后可能面临性能压力；系统尚未提供数据导入导出、操作日志审计与消息通知能力。后续可在服务端补充令牌鉴权与接口级权限拦截，引入缓存组件优化统计查询性能，并扩展报表导出与操作审计功能，进一步提升系统的安全性与完整性。
