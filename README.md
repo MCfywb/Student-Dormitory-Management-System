@@ -31,7 +31,7 @@
 | Vue | 3.5.44 |
 | Vite | 8.3.4 |
 | Element Plus | 2.14.7 |
-| Pinia | 4.0.3 |
+| Pinia | 4.1.0 |
 | Vue Router | 5.4.0 |
 | Axios | 1.20.0 |
 | ECharts | 6.1.0 |
