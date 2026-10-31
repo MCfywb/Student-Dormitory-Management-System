@@ -33,7 +33,7 @@
 | Element Plus | 2.14.7 |
 | Pinia | 4.1.0 |
 | Vue Router | 5.4.0 |
-| Axios | 1.20.0 |
+| Axios | 1.21.0 |
 | ECharts | 6.1.0 |
 
 ---
