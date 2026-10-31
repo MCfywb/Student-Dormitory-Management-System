@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -39,21 +39,21 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
-            <version>3.5.17</version>
+            <version>3.5.18.1</version>
         </dependency>
 
         <!-- MyBatis Plus Jsqlparser -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>3.5.17</version>
+            <version>3.5.18.1</version>
         </dependency>
 
         <!-- MySQL Driver -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>26.7.0</version>
+            <version>26.10.0</version>
         </dependency>
 
         <!-- Lombok -->
@@ -75,14 +75,14 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.47</version>
+            <version>5.8.48</version>
         </dependency>
 
         <!-- FastJSON -->
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
-            <version>2.0.65</version>
+            <version>2.0.66</version>
         </dependency>
 
         <!-- Spring Boot Test -->
