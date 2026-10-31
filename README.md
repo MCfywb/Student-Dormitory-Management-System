@@ -16,11 +16,11 @@
 
 | 技术 | 版本 |
 |------|------|
-| Spring Boot | 4.1.1 |
+| Spring Boot | 4.1.2 |
 | JDK | 25 |
 | Maven | 3.10.0 |
-| MyBatis-Plus | 3.5.17 |
-| MySQL | 26.7.0 |
+| MyBatis-Plus | 3.5.18.1 |
+| MySQL | 26.10.0 |
 | JJWT | 0.13.0 |
 | Lombok | 1.18.48 |
 
